@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gallary/helpers/profile/profile_pic.dart';
 import 'package:gallary/helpers/shaders/circle_shader.dart';
-import 'package:gallary/pages/group/widgets/profile_image.dart';
 
 import '../widgets/value_box.dart';
 

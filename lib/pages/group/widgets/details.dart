@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gallary/pages/group/widgets/profile_image.dart';
+import 'package:gallary/helpers/profile/profile_pic.dart';
 
 class GroupDetails extends StatelessWidget {
   const GroupDetails({super.key});

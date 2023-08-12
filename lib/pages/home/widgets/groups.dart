@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:gallary/helpers/profile/profile_pic.dart';
 import 'package:gallary/pages/group/group.dart';
-import 'package:gallary/pages/group/widgets/profile_image.dart';
 
 class GroupList extends StatelessWidget {
   const GroupList({super.key});
