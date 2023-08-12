@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gallary/helpers/shaders/circle_shader.dart';
-import 'package:gallary/pages/home/widgets/widgets.dart';
 
 class TabBarWidget extends StatefulWidget {
-  const TabBarWidget({super.key});
+  final List<String> tabs;
+  final List<Widget> tabViews;
+  const TabBarWidget({super.key, required this.tabs, required this.tabViews});
 
   @override
   State<TabBarWidget> createState() => _TabBarWidgetState();
@@ -58,16 +59,12 @@ class _TabBarWidgetState extends State<TabBarWidget>
             children: <Widget>[
               // tabs widget
               TabBar(
-                controller: _tabController,
-                tabs: const <Widget>[
-                  Tab(
-                    text: 'Groups',
-                  ),
-                  Tab(
-                    text: 'Photos',
-                  ),
-                ],
-              ),
+                  controller: _tabController,
+                  tabs: widget.tabs
+                      .map((tab) => Tab(
+                            text: tab,
+                          ))
+                      .toList()),
 
               // margin
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -76,12 +73,7 @@ class _TabBarWidgetState extends State<TabBarWidget>
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: const <Widget>[
-                    // Groups View
-                    GroupList(),
-                    // Gallary grid view
-                    ImageGrid()
-                  ],
+                  children: widget.tabViews,
                 ),
               )
             ],

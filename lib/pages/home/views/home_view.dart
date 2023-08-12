@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' show pi;
 
 import 'package:flutter/material.dart';
 import 'package:gallary/pages/home/widgets/widgets.dart';
@@ -73,7 +73,10 @@ class _HomeViewState extends State<HomeView>
                   borderRadius: BorderRadius.all(
                     Radius.circular(animation.value * 24),
                   ),
-                  child: const TabBarWidget(),
+                  child: const TabBarWidget(
+                    tabs: ['Groups', 'Photos'],
+                    tabViews: <Widget>[GroupList(), ImageGrid()],
+                  ),
                 ),
               ),
             ),
