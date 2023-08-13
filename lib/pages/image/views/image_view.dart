@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:photo_gallery/photo_gallery.dart' show Medium;
 
 import '../widgets/widgets.dart';
 
 class DetailsPage extends StatefulWidget {
-  final String imagePath;
+  final Medium image;
   final int index;
 
-  const DetailsPage({super.key, required this.imagePath, required this.index});
+  const DetailsPage({super.key, required this.image, required this.index});
 
   @override
   State<DetailsPage> createState() => _DetailsPageState();
@@ -64,7 +65,7 @@ class _DetailsPageState extends State<DetailsPage>
           _animationController.forward();
         },
         child: ImageBox(
-          imagePath: widget.imagePath,
+          image: widget.image,
           index: widget.index,
           transformationController: _transformationController,
           animationcontroller: _animationController,

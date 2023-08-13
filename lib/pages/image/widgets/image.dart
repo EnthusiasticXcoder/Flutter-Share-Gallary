@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:photo_gallery/photo_gallery.dart' show Medium, PhotoProvider;
 
 class ImageBox extends StatefulWidget {
   final TransformationController transformationController;
-  final String imagePath;
+  final Medium image;
   final int index;
   final AnimationController animationcontroller;
 
   const ImageBox(
       {super.key,
-      required this.imagePath,
+      required this.image,
       required this.index,
       required this.transformationController,
       required this.animationcontroller});
@@ -42,7 +43,7 @@ class _ImageBoxState extends State<ImageBox>
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTapCancel: () => Navigator.of(context).pop(),
+      // onTapCancel: () => Navigator.of(context).pop(),
       onTap: () {
         if (widget.animationcontroller.value == 0) {
           widget.animationcontroller.forward();
@@ -71,32 +72,32 @@ class _ImageBoxState extends State<ImageBox>
                 parent: _zoomcontroller, curve: Curves.fastOutSlowIn));
         _zoomcontroller.forward(from: 0);
       },
+      // Image to be displayed
       child: SizedBox(
-        height: double.infinity,
-        width: double.maxFinite,
-        child: Image.network(
-          widget.imagePath,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) => Container(
-            width: double.maxFinite,
-            decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(15)),
-            child: child,
-          ),
-          errorBuilder: (context, error, stackTrace) => Container(
-            width: double.maxFinite,
-            decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(15)),
-            child: const Center(child: Text('Error! Unable To Load Image')),
-          ),
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => Hero(
-            tag: 'logo${widget.index}',
-            child: child,
-          ),
-        ),
-      ),
+          height: double.infinity,
+          width: double.maxFinite,
+          child: Image(
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, _) => Container(
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: child,
+                  ),
+              errorBuilder: (context, __, _) => Container(
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(15)),
+                    child: const Center(
+                        child: Text('Error! Unable To Load Image')),
+                  ),
+              frameBuilder: (context, child, __, _) => Hero(
+                    tag: 'logo${widget.index}',
+                    child: child,
+                  ),
+              image: PhotoProvider(mediumId: widget.image.id))),
     );
   }
 }
