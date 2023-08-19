@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'pages/home/home.dart';
+import 'package:gallary/routs/app_routs.dart';
 
-void main() => runApp(const MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppRouts _appRouts = AppRouts();
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +21,13 @@ class MyApp extends StatelessWidget {
           filled: true,
           fillColor: Colors.white,
           errorStyle: TextStyle(height: 0),
-          border: defaultInputBorder,
+          border: defaultInputBorder, 
           enabledBorder: defaultInputBorder,
           focusedBorder: defaultInputBorder,
           errorBorder: defaultInputBorder,
         ),
       ),
-      home: const HomeView(),
+      onGenerateRoute: (settings) => _appRouts.onGenerateRouts(settings),
     );
   }
 }
