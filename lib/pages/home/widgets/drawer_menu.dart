@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:gallary/pages/profile/views/profile_view.dart';
-import 'package:gallary/pages/signin/view/welcome_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gallary/routs/app_routs.dart';
+import 'package:gallary/services/auth/bloc/auth_bloc.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.sizeOf(context).height;
     return SafeArea(
       child: Container(
-        width: 288,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          color: Color(0xFF17203A),
-          borderRadius: BorderRadius.all(
-            Radius.circular(30),
-          ),
-        ),
+        color: Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // margin
-            const SizedBox(height: 40),
+            SizedBox(height: height * 0.05),
             // user details and profile
             infoTile(
               context,
@@ -29,18 +24,11 @@ class DrawerMenu extends StatelessWidget {
               email: 'example124@gmail.com',
             ),
             // divider
-            const Divider(
-              color: Colors.white24,
-            ),
+            const Divider(color: Colors.white24),
             // backup button
             menuTile(
               icon: const Icon(Icons.backup_rounded),
               title: const Text('Backup'),
-              onPress: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const WelcomeView(),
-                ));
-              },
             ),
             // Account Storage
             menuTile(
@@ -77,25 +65,25 @@ class DrawerMenu extends StatelessWidget {
     required String name,
     required String email,
     String? image,
-  }) {
-    return ListTile(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const ProfileScreen(),
-        ));
-      },
-      textColor: Colors.white,
-      leading: Hero(
-        tag: 'User Profile',
-        child: CircleAvatar(
-          foregroundImage: (image != null) ? NetworkImage(image) : null,
-          child: const Icon(Icons.person),
+  }) =>
+      ListTile(
+        onTap: () {
+          Navigator.of(context).pushNamed(
+            AppRouts.profileView,
+            arguments: BlocProvider.of<AuthBloc>(context),
+          );
+        },
+        textColor: Colors.white,
+        leading: Hero(
+          tag: 'User Profile',
+          child: CircleAvatar(
+            foregroundImage: (image != null) ? NetworkImage(image) : null,
+            child: const Icon(Icons.person),
+          ),
         ),
-      ),
-      title: Text(name),
-      subtitle: Text(email),
-    );
-  }
+        title: Text(name),
+        subtitle: Text(email),
+      );
 
   ListTile menuTile({
     required Widget icon,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gallary/pages/group/widgets/details.dart';
-import 'package:gallary/pages/home/widgets/image_grid.dart';
+import 'package:gallary/helpers/image/image_grid.dart';
+import 'package:gallary/routs/app_routs.dart';
 
 class GroupView extends StatelessWidget {
   const GroupView({super.key});
@@ -13,8 +13,7 @@ class GroupView extends StatelessWidget {
         leadingWidth: 20.0,
         title: ListTile(
           onTap: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) =>  const GroupDetails()));
+            Navigator.of(context).pushNamed(AppRouts.groupDetailsPage);
           },
           minLeadingWidth: 0.0,
           leading: const Hero(
@@ -51,7 +50,9 @@ class GroupView extends StatelessWidget {
         ),
         child: const Padding(
           padding: EdgeInsets.all(8.0),
-          child: ImageGrid(),
+          child: ImageGrid(
+            images: [], //          ---------------------------
+          ),
         ),
       ),
     );

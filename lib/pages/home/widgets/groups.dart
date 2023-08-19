@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:gallary/helpers/profile/profile_pic.dart';
-import 'package:gallary/pages/group/group.dart';
+import 'package:gallary/routs/app_routs.dart';
 
 class GroupList extends StatelessWidget {
   const GroupList({super.key});
@@ -12,8 +12,7 @@ class GroupList extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) => ListTile(
               onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const GroupView()));
+                Navigator.of(context).pushNamed(AppRouts.groupPage);
               },
               leading: InkWell(
                 onTap: () {

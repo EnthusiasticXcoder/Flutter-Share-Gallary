@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/profile/profile_pic.dart';
 import 'package:gallary/helpers/shaders/circle_shader.dart';
+import 'package:gallary/services/auth/bloc/auth_bloc.dart';
 
 import '../widgets/value_box.dart';
 
@@ -65,8 +67,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
-                        child: Row(
+                      PopupMenuItem(
+                        onTap: () {
+                          context.read<AuthBloc>().add(
+                                const AuthEventWelcome(),
+                              );
+                          final navigator = Navigator.of(context);
+                          if (navigator.canPop()) navigator.pop();
+                        },
+                        child: const Row(
                           children: [
                             Icon(Icons.delete_forever),
                             SizedBox(width: 8.0),

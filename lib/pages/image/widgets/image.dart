@@ -43,7 +43,6 @@ class _ImageBoxState extends State<ImageBox>
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // onTapCancel: () => Navigator.of(context).pop(),
       onTap: () {
         if (widget.animationcontroller.value == 0) {
           widget.animationcontroller.forward();
@@ -77,18 +76,17 @@ class _ImageBoxState extends State<ImageBox>
           height: double.infinity,
           width: double.maxFinite,
           child: Image(
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, _) => Container(
+              loadingBuilder: (context, child, loading) => Container(
                     width: double.maxFinite,
                     decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: Colors.black87,
                         borderRadius: BorderRadius.circular(15)),
                     child: child,
                   ),
               errorBuilder: (context, __, _) => Container(
                     width: double.maxFinite,
                     decoration: BoxDecoration(
-                        color: Colors.grey[400],
+                        color: Colors.black87,
                         borderRadius: BorderRadius.circular(15)),
                     child: const Center(
                         child: Text('Error! Unable To Load Image')),

@@ -4,7 +4,11 @@ import 'package:gallary/helpers/shaders/circle_shader.dart';
 class TabBarWidget extends StatefulWidget {
   final List<String> tabs;
   final List<Widget> tabViews;
-  const TabBarWidget({super.key, required this.tabs, required this.tabViews});
+  const TabBarWidget({
+    super.key,
+    required this.tabs,
+    required this.tabViews,
+  });
 
   @override
   State<TabBarWidget> createState() => _TabBarWidgetState();
