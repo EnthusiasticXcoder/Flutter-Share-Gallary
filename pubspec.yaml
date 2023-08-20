@@ -41,6 +41,9 @@ dependencies:
   photo_gallery: ^2.1.1
   # Firebase Intrigation
   firebase_core: ^2.15.0
+  firebase_auth: ^4.7.3
+  # Sign in With Google
+  google_sign_in: ^6.1.4
   # added Bloc State management dependency
   bloc: ^8.1.2
   flutter_bloc: ^8.1.3
