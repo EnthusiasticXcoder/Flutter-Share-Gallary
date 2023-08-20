@@ -4,9 +4,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-
+    
     <application
-        android:label="gallary"
+        android:label="share_gallary"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -36,5 +36,4 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-
 </manifest>

@@ -1,4 +1,4 @@
-package com.example.gallary.gallary
+package com.example.share_gallary
 
 import io.flutter.embedding.android.FlutterActivity
 
