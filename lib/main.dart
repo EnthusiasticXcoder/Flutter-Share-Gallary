@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gallary/routs/app_routs.dart';
 
-void main() => runApp(MyApp());
+import 'routs/app_routs.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   final AppRouts _appRouts = AppRouts();
@@ -18,10 +22,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'Sen',
         inputDecorationTheme: const InputDecorationTheme(
-          filled: true,
+          filled: true, 
           fillColor: Colors.white,
           errorStyle: TextStyle(height: 0),
-          border: defaultInputBorder, 
+          border: defaultInputBorder,
           enabledBorder: defaultInputBorder,
           focusedBorder: defaultInputBorder,
           errorBorder: defaultInputBorder,
