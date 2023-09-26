@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/loading_screen.dart';
-import 'package:gallary/services/auth/auth_service.dart';
+import 'package:gallary/pages/auth/view/google_signin.dart';
+import 'package:gallary/services/cloud/cloud.dart';
 
 import 'helpers/message_box.dart';
 import 'pages/auth/auth.dart';
 import 'pages/home/home.dart';
 import 'services/auth/auth.dart';
-import 'services/cloud/bloc/cloud_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -33,13 +33,16 @@ class HomePage extends StatelessWidget {
         switch (state.runtimeType) {
           case AuthLoggedIn:
             return BlocProvider(
-              create: (context) => CloudBloc(AuthService.firebase()),
+              create: (context) => CloudBloc(
+                  FirebaseFirestoreProvider(), FirebaseCloudStorage()),
               child: const HomeView(),
             );
           case AuthSignIn:
             return SignInView();
           case AuthSignUp:
             return SignUpView();
+          case AuthGoogleSignIn:
+            return GoogleSigninView();
           case AuthAuthoriseUser:
             return const VerificationView();
           case AuthForgotPassword:
