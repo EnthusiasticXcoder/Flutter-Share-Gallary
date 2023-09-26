@@ -42,8 +42,14 @@ dependencies:
   # Firebase Intrigation
   firebase_core: ^2.15.0
   firebase_auth: ^4.7.3
+  # firebase Database
+  cloud_firestore: ^4.9.0
+  # firebase cloud storage
+  firebase_storage: ^11.2.6
   # Sign in With Google
   google_sign_in: ^6.1.4
+  # image picker dependency
+  image_picker: ^1.0.2
   # added Bloc State management dependency
   bloc: ^8.1.2
   flutter_bloc: ^8.1.3
