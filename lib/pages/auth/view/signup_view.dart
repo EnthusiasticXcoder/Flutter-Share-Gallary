@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:gallary/pages/auth/widget/widget.dart';
-import 'package:gallary/services/auth/bloc/auth_bloc.dart';
+import 'package:gallary/pages/auth/auth.dart';
+import 'package:gallary/services/auth/auth.dart';
 
 class SignUpView extends StatelessWidget {
-  const SignUpView({super.key});
+  final args = {
+    'Name': '',
+    'Email': '',
+    'Password': '',
+    'Confirm Password': '',
+  };
+  final _formKey = GlobalKey<FormState>();
+  SignUpView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
         context.read<AuthBloc>().add(
-              const AuthEventWelcome(),
+              const AuthEventLogout(),
             );
         return Future.value(false);
       },
@@ -20,10 +26,10 @@ class SignUpView extends StatelessWidget {
           title: 'Sign Up',
           onBack: () {
             context.read<AuthBloc>().add(
-                  const AuthEventWelcome(),
+                  const AuthEventLogout(),
                 );
           },
-          relBoxheight: 0.57,
+          relBoxheight: 0.6,
           bottom: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -31,62 +37,79 @@ class SignUpView extends StatelessWidget {
               TextButton(
                   onPressed: () {
                     context.read<AuthBloc>().add(
-                          const AuthEventShouldSignIn(),
+                          const AuthEventSignIn(),
                         );
                   },
                   child: const Text('Sign In Here'))
             ],
           ),
-          child: Column(
-            children: <Widget>[
-              // Name Input Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <SizedBox>[
-                  // First Name
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.38,
-                    child: const TextInputField(label: 'First Name'),
-                  ),
-                  // Last Name
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.38,
-                    child: const TextInputField(label: 'Last Name'),
-                  ),
-                ],
-              ),
-              // margin
-              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              // Email Input Field
-              const TextInputField(label: 'Email', prefixIcon: Icons.email),
-              // margin
-              SizedBox(height: MediaQuery.of(context).size.height * 0.015),
-              // Password Input Field
-              const TextInputField(
-                obscureText: true,
-                label: 'Password',
-                prefixIcon: Icons.key,
-              ),
-              // margin
-              SizedBox(height: MediaQuery.of(context).size.height * 0.015),
-              // Password Input Field
-              const TextInputField(
-                obscureText: true,
-                label: 'Confirm Password',
-                prefixIcon: Icons.password,
-              ),
-              // margin
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-              // Sign in button
-              ForwardLabelButton(
-                onPress: () {
-                  context.read<AuthBloc>().add(
-                        const AuthEventSignUp(),
-                      );
-                },
-                label: 'Sign Up',
-              ),
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                // Name Input Field
+                TextInputField(
+                  label: 'Full Name',
+                  onChange: (value) {
+                    args.update('Name', (old) => value!);
+                  },
+                ),
+
+                // Email Input Field
+                TextInputField(
+                  onChange: (value) {
+                    args.update('Email', (old) => value!);
+                  },
+                  label: 'Email',
+                  prefixIcon: Icons.email,
+                ),
+
+                // Password Input Field
+                TextInputField(
+                  onChange: (value) {
+                    args.update('Password', (old) => value!);
+                  },
+                  obscureText: true,
+                  label: 'Password',
+                  prefixIcon: Icons.key,
+                ),
+
+                // Password Input Field
+                TextInputField(
+                  obscureText: true,
+                  label: 'Confirm Password',
+                  onChange: (value) {
+                    args.update('Confirm Password', (old) => value!);
+                  },
+                  prefixIcon: Icons.password,
+                ),
+
+                // margin
+                SizedBox(height: MediaQuery.of(context).size.height * 0.015),
+                // Sign in button
+                ForwardLabelButton(
+                  onPress: () {
+                    final name = args['Name'];
+                    final email = args['Email'];
+                    final password = args['Password'];
+                    final confirmPassword = args['Confirm Password'];
+
+                    if (_formKey.currentState!.validate() &&
+                        password == confirmPassword) {
+                      context.read<AuthBloc>().add(
+                            AuthEventSignUp(
+                              name: name,
+                              email: email,
+                              password: password,
+                            ),
+                          );
+                    }
+                  },
+                  label: 'Sign Up',
+                ),
+              ],
+            ),
           )),
     );
   }

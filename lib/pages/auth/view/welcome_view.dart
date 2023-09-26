@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:gallary/pages/auth/widget/widget.dart';
 import 'package:gallary/services/auth/bloc/auth_bloc.dart';
+import 'package:gallary/services/auth/bloc/bloc.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});
@@ -27,7 +28,7 @@ class WelcomeView extends StatelessWidget {
           ElevatedButton(
               onPressed: () {
                 context.read<AuthBloc>().add(
-                      const AuthEventShouldSignIn(),
+                      const AuthEventSignIn(),
                     );
               },
               style: ElevatedButton.styleFrom(
@@ -46,7 +47,7 @@ class WelcomeView extends StatelessWidget {
           OutlinedButton(
               onPressed: () {
                 context.read<AuthBloc>().add(
-                      const AuthEventShouldSignUp(),
+                      const AuthEventSignUp(),
                     );
               },
               style: OutlinedButton.styleFrom(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:gallary/pages/auth/widget/widget.dart';
-import 'package:gallary/services/auth/bloc/auth_bloc.dart';
+import 'package:gallary/services/auth/auth.dart';
 
 class VerificationView extends StatelessWidget {
   const VerificationView({super.key});
@@ -12,7 +12,7 @@ class VerificationView extends StatelessWidget {
     return WillPopScope(
       onWillPop: () {
         context.read<AuthBloc>().add(
-              const AuthEventShouldSignUp(),
+              const AuthEventSignUp(),
             );
         return Future.value(false);
       },
@@ -22,7 +22,7 @@ class VerificationView extends StatelessWidget {
             'We Have Sent A Email Verification OTP To Your Mail Account Example.123@gmail.com',
         onBack: () {
           context.read<AuthBloc>().add(
-                const AuthEventShouldSignUp(),
+                const AuthEventSignUp(),
               );
         },
         relBoxheight: 0.2,
@@ -66,9 +66,9 @@ class VerificationView extends StatelessWidget {
                       FocusScope.of(context).previousFocus();
                     }
                     if (value.length == 1) {
-                      context.read<AuthBloc>().add(
-                            const AuthEventAuthoriseUser(),
-                          );
+                      // context.read<AuthBloc>().add(
+                      //       const AuthEvent(),
+                      //     );
                     }
                   },
                 ),
