@@ -9,7 +9,7 @@ import 'package:gallary/services/auth/auth_user.dart';
 import 'package:gallary/services/auth/profile/profile_bloc.dart';
 import 'package:image_picker/image_picker.dart' show ImageSource;
 
-import '../widgets/value_box.dart';
+import '../widgets/widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -27,6 +27,11 @@ class ProfileScreen extends StatelessWidget {
           MessageBox.showMessage(context, state.message!);
         }
         if (state is ProfileStateExit) {
+          if (!state.isLoggedin) {
+            context.read<AuthBloc>().add(
+                  const AuthEventInitialise(),
+                );
+          }
           final navigator = Navigator.of(context);
           navigator.popUntil((route) => !navigator.canPop());
         } else if (state is ProfileStateShowProfilePic) {
@@ -54,6 +59,12 @@ class ProfileScreen extends StatelessWidget {
                   );
             },
           );
+        } else if (state is ProfileStateShowMenu) {
+          ProfileMenu.showMenu(context);
+        } else if (state is ProfileStateDeleteUser) {
+          DeleteDialog.showDialog(context);
+        } else if (state is ProfileStateChangePassword) {
+          ChangePassword.showDialog(context);
         }
       },
       child: Scaffold(
@@ -70,42 +81,9 @@ class ProfileScreen extends StatelessWidget {
           actions: <IconButton>[
             IconButton(
                 onPressed: () {
-                  showMenu(
-                      shape: ContinuousRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.0)),
-                      context: context,
-                      position: RelativeRect.fromLTRB(
-                          MediaQuery.of(context).size.width * 0.13,
-                          0,
-                          MediaQuery.of(context).size.width * 0.12,
-                          0),
-                      items: [
-                        const PopupMenuItem(
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit),
-                              SizedBox(width: 8.0),
-                              Text('Change Profile Picture'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          onTap: () {
-                            context.read<AuthBloc>().add(
-                                  const AuthEventLogout(),
-                                );
-                            final navigator = Navigator.of(context);
-                            if (navigator.canPop()) navigator.pop();
-                          },
-                          child: const Row(
-                            children: [
-                              Icon(Icons.delete_forever),
-                              SizedBox(width: 8.0),
-                              Text('Delete Account'),
-                            ],
-                          ),
-                        ),
-                      ]);
+                  context.read<ProfileBloc>().add(
+                        const ProfileEventShowMenu(),
+                      );
                 },
                 icon: const Icon(Icons.more_vert))
           ],
