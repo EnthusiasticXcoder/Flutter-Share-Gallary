@@ -1,41 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/image/image_grid.dart';
 import 'package:gallary/routs/app_routs.dart';
+import 'package:gallary/services/cloud/bloc/bloc.dart';
 
 class GroupView extends StatelessWidget {
-  const GroupView({super.key});
+  final String groupId;
+  const GroupView({super.key, required this.groupId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade400,
-      appBar: AppBar(
-        leadingWidth: 20.0,
-        title: ListTile(
-          onTap: () {
-            Navigator.of(context).pushNamed(AppRouts.groupDetailsPage);
-          },
-          minLeadingWidth: 0.0,
-          leading: const Hero(
-            tag: 'CircularProfileIcon',
-            child: CircleAvatar(
-              child: Icon(Icons.group),
-            ),
-          ),
-          title: const Text(
-            'Group Name',
-            style: TextStyle(
-                fontWeight: FontWeight.w400, fontSize: 15, color: Colors.white),
-          ),
-          subtitle: const Text(
-            'Subtitle Text For The Group',
-            style: TextStyle(fontSize: 12, color: Colors.white),
-          ),
-        ),
-        toolbarHeight: 90,
-        iconTheme: const IconThemeData(size: 30, color: Colors.white),
-        backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-      ),
+      appBar: GroupInfoAppBar(groupId: groupId),
       body: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 10,
@@ -57,4 +34,72 @@ class GroupView extends StatelessWidget {
       ),
     );
   }
+}
+
+class GroupInfoAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const GroupInfoAppBar({
+    super.key,
+    required this.groupId,
+  });
+
+  final String groupId;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      titleSpacing: 0,
+      leading: TextButton(
+        onPressed: () => Navigator.pop(context),
+        style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0)),
+        child: const Row(
+          children: <Widget>[
+            BackButtonIcon(),
+            Hero(
+              tag: 'CircularProfileIcon',
+              child: CircleAvatar(
+                child: Icon(Icons.group),
+              ),
+            )
+          ],
+        ),
+      ),
+      leadingWidth: 80,
+      title: StreamBuilder<GroupData>(
+          stream:
+              context.select((CloudBloc bloc) => bloc.getGroupData(groupId)),
+          builder: (context, snapshot) {
+            return ListTile(
+              shape: const StadiumBorder(),
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  AppRouts.groupDetailsPage,
+                  arguments: groupId,
+                );
+              },
+              title: Text(
+                snapshot.data?.name ?? '',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
+              subtitle: Text(
+                snapshot.data?.info ?? '',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+            );
+          }),
+      toolbarHeight: 90,
+      iconTheme: const IconThemeData(size: 30, color: Colors.white),
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size(double.maxFinite, 90);
 }

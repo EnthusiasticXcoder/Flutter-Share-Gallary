@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/services/auth/auth.dart';
 import 'package:gallary/services/auth/auth_service.dart';
 import 'package:gallary/services/auth/profile/profile_bloc.dart';
-import 'package:gallary/services/cloud/bloc/bloc.dart';
+import 'package:gallary/services/cloud/cloud.dart';
 import 'package:photo_gallery/photo_gallery.dart';
 
 import '../app.dart';
 import '../pages/group/views/group_view.dart';
-import '../pages/group/widgets/details.dart';
+import '../pages/group/views/details.dart';
 import '../pages/image/views/image_view.dart';
 import '../pages/profile/views/profile_view.dart';
 
@@ -33,32 +33,39 @@ class AppRouts {
           },
         );
       case AppRouts.profileView:
-        final providers = settings.arguments as List;
         return MaterialPageRoute(
           builder: (context) => MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) => ProfileBloc(_service),
+                create: (context) =>
+                    ProfileBloc(_service, FirebaseCloudStorage()),
               ),
               BlocProvider.value(
-                value: providers.first as AuthBloc,
-              ),
-              BlocProvider.value(
-                value: providers.last as CloudBloc,
+                value: settings.arguments as AuthBloc,
               ),
             ],
-            child: ProfileScreen(
-              user: _service.currentUser!,
-            ),
+            child: const ProfileScreen(),
           ),
         );
       case AppRouts.groupPage:
         return MaterialPageRoute(
-          builder: (context) => const GroupView(),
+          builder: (context) => BlocProvider(
+            create: (context) =>
+                CloudBloc(FirebaseFirestoreProvider(), FirebaseCloudStorage()),
+            child: GroupView(
+              groupId: settings.arguments as String,
+            ),
+          ),
         );
       case AppRouts.groupDetailsPage:
         return MaterialPageRoute(
-          builder: (context) => const GroupDetails(),
+          builder: (context) => BlocProvider(
+            create: (context) =>
+                CloudBloc(FirebaseFirestoreProvider(), FirebaseCloudStorage()),
+            child: GroupDetails(
+              groupId: settings.arguments as String,
+            ),
+          ),
         );
       case AppRouts.viewImagePage:
         return MaterialPageRoute(
