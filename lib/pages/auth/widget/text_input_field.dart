@@ -23,13 +23,15 @@ class TextInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscureText,
       onChanged: onChange,
       onTapOutside: (event) {
         FocusScope.of(context).unfocus();
       },
+      validator: (value) =>
+          (value != null && value.isNotEmpty) ? null : 'Required Field',
       style: const TextStyle(color: Colors.blueGrey),
       decoration: InputDecoration(
         prefixIcon: (prefixIcon == null) ? null : Icon(prefixIcon),

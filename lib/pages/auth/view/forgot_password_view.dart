@@ -11,7 +11,7 @@ class ForgotPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PaintedScaffold(
-      relBoxheight: 0.25,
+      relBoxheight: 0.28,
       title: 'Reset Password',
       onBack: () {
         context.read<AuthBloc>().add(
@@ -30,6 +30,7 @@ class ForgotPasswordView extends StatelessWidget {
         child: Form(
           key: _formKey,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextInputField(
                 label: 'Enter Your Email',
