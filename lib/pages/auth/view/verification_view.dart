@@ -19,68 +19,51 @@ class VerificationView extends StatelessWidget {
       child: PaintedScaffold(
         title: 'Email Verification',
         label:
-            'We Have Sent A Email Verification OTP To Your Mail Account Example.123@gmail.com',
+            'We Have Sent A Email Varification Link on Your Email. Please Cheack The Email And Click On The Link To Verify Your Email.',
         onBack: () {
           context.read<AuthBloc>().add(
                 const AuthEventSignUp(),
               );
         },
-        relBoxheight: 0.2,
+        relBoxheight: 0.3,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Row>[
-            // OTP Holder
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <OTPEntry>[
-                // first
-                OTPEntry(
-                  onChange: (value) {
-                    if (value.length == 1) {
-                      FocusScope.of(context).nextFocus();
-                    }
-                  },
-                ),
-                // second
-                OTPEntry(onChange: (value) {
-                  if (value.isEmpty) {
-                    FocusScope.of(context).previousFocus();
-                  } else if (value.length == 1) {
-                    FocusScope.of(context).nextFocus();
-                  }
-                }),
-                // third
-                OTPEntry(
-                  onChange: (value) {
-                    if (value.isEmpty) {
-                      FocusScope.of(context).previousFocus();
-                    } else if (value.length == 1) {
-                      FocusScope.of(context).nextFocus();
-                    }
-                  },
-                ),
-                // fourth
-                OTPEntry(
-                  onChange: (value) {
-                    if (value.isEmpty) {
-                      FocusScope.of(context).previousFocus();
-                    }
-                    if (value.length == 1) {
-                      // context.read<AuthBloc>().add(
-                      //       const AuthEvent(),
-                      //     );
-                    }
-                  },
-                ),
-              ],
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const Text('If Not Auto Redirected, Click On Continue Button.'),
+            // margin
+
+            SizedBox(height: MediaQuery.sizeOf(context).height * 0.06),
+            // continue button
+            OutlinedButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(
+                      const AuthEventCheackEmailVerification(),
+                    );
+              },
+              style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.black12,
+                  foregroundColor: Colors.black87,
+                  minimumSize: const Size.fromHeight(45),
+                  shape: ContinuousRectangleBorder(
+                      borderRadius: BorderRadius.circular(18))),
+              child: const Text(
+                'Continue',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
 
             // resend text
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Didn\'t Recieve Code?'),
-                TextButton(onPressed: () {}, child: const Text('Resend Code'))
+                const Text('Didn\'t Recieve Mail?'),
+                TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            const AuthEventResendVerificationEmail(),
+                          );
+                    },
+                    child: const Text('Resend Mail'))
               ],
             ),
           ],
