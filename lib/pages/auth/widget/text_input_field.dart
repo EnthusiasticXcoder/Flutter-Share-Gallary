@@ -31,7 +31,7 @@ class TextInputField extends StatelessWidget {
         FocusScope.of(context).unfocus();
       },
       validator: (value) =>
-          (value != null || value!.isNotEmpty) ? null : 'Required Field',
+          (value == null || value.isEmpty) ? 'Required Field' : null,
       style: const TextStyle(color: Colors.blueGrey),
       decoration: InputDecoration(
         prefixIcon: (prefixIcon == null) ? null : Icon(prefixIcon),
