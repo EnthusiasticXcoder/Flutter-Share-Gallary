@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/routs/app_routs.dart';
+import 'package:gallary/services/auth/auth_user.dart';
 import 'package:gallary/services/auth/bloc/auth_bloc.dart';
+import 'package:gallary/services/cloud/bloc/bloc.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
@@ -18,11 +20,16 @@ class DrawerMenu extends StatelessWidget {
             // margin
             SizedBox(height: height * 0.05),
             // user details and profile
-            infoTile(
-              context,
-              name: 'User Name',
-              email: 'example124@gmail.com',
-            ),
+            StreamBuilder<AuthUser?>(
+                stream: context.select((CloudBloc bloc) => bloc.userChange),
+                builder: (context, snapshot) {
+                  return infoTile(
+                    context,
+                    name: snapshot.data?.name,
+                    email: snapshot.data?.email,
+                    image: snapshot.data?.photo,
+                  );
+                }),
             // divider
             const Divider(color: Colors.white24),
             // backup button
@@ -62,8 +69,8 @@ class DrawerMenu extends StatelessWidget {
 
   ListTile infoTile(
     BuildContext context, {
-    required String name,
-    required String email,
+    required String? name,
+    required String? email,
     String? image,
   }) =>
       ListTile(
@@ -81,8 +88,11 @@ class DrawerMenu extends StatelessWidget {
             child: const Icon(Icons.person),
           ),
         ),
-        title: Text(name),
-        subtitle: Text(email),
+        title: Text(name ?? ''),
+        subtitle: Text(
+          email ?? '',
+          overflow: TextOverflow.ellipsis,
+        ),
       );
 
   ListTile menuTile({
