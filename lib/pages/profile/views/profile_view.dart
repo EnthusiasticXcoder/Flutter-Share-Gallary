@@ -1,128 +1,175 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gallary/helpers/loading_screen.dart';
+import 'package:gallary/helpers/message_box.dart';
 import 'package:gallary/helpers/profile/profile_pic.dart';
 import 'package:gallary/helpers/shaders/circle_shader.dart';
-import 'package:gallary/services/auth/bloc/auth_bloc.dart';
+import 'package:gallary/services/auth/auth.dart';
+import 'package:gallary/services/auth/auth_user.dart';
+import 'package:gallary/services/auth/profile/profile_bloc.dart';
+import 'package:image_picker/image_picker.dart' show ImageSource;
 
 import '../widgets/value_box.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _infoController;
-
-  @override
-  void initState() {
-    _nameController = TextEditingController();
-    _infoController = TextEditingController();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _infoController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 231, 242, 249),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          'User Profile',
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-        actions: <IconButton>[
-          IconButton(
-              onPressed: () {
-                showMenu(
-                    shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(24.0)),
-                    context: context,
-                    position: RelativeRect.fromLTRB(
-                        MediaQuery.of(context).size.width * 0.13,
-                        0,
-                        MediaQuery.of(context).size.width * 0.12,
-                        0),
-                    items: [
-                      const PopupMenuItem(
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit),
-                            SizedBox(width: 8.0),
-                            Text('Change Profile Picture'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        onTap: () {
-                          context.read<AuthBloc>().add(
-                                const AuthEventWelcome(),
-                              );
-                          final navigator = Navigator.of(context);
-                          if (navigator.canPop()) navigator.pop();
-                        },
-                        child: const Row(
-                          children: [
-                            Icon(Icons.delete_forever),
-                            SizedBox(width: 8.0),
-                            Text('Delete Account'),
-                          ],
-                        ),
-                      ),
-                    ]);
-              },
-              icon: const Icon(Icons.more_vert))
-        ],
-      ),
-      body: SafeArea(
-        child: CustomPaint(
-          painter: BlueCirclePainter(),
-          child: Column(
-            children: [
-              // upper margin
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-              // Profile Picture Widget
-              Hero(
-                tag: 'User Profile',
-                child: GestureDetector(
-                  onTap: () {
-                    showDialog(
+    return BlocListener<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state.isLoading) {
+          LoadingScreen().showLoadingScreen(context);
+        } else {
+          LoadingScreen().hideLoadingScreen(context);
+        }
+        if (state.message != null) {
+          MessageBox.showMessage(context, state.message!);
+        }
+        if (state is ProfileStateExit) {
+          final navigator = Navigator.of(context);
+          navigator.popUntil((route) => !navigator.canPop());
+        } else if (state is ProfileStateShowProfilePic) {
+          ProfilePicture.showDialog(
+            context,
+            state.imageURI,
+            Icons.person,
+            onDeletePic: () {
+              Navigator.pop(context);
+              context.read<ProfileBloc>().add(
+                    const ProfileEventUpdateProfile(deleteImage: true),
+                  );
+            },
+            oncameraPic: () {
+              Navigator.pop(context);
+              context.read<ProfileBloc>().add(
+                    const ProfileEventUpdateProfile(source: ImageSource.camera),
+                  );
+            },
+            onGallaryPic: () {
+              Navigator.pop(context);
+              context.read<ProfileBloc>().add(
+                    const ProfileEventUpdateProfile(
+                        source: ImageSource.gallery),
+                  );
+            },
+          );
+        }
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        resizeToAvoidBottomInset: false,
+        backgroundColor: const Color.fromARGB(255, 231, 242, 249),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          title: const Text(
+            'User Profile',
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          actions: <IconButton>[
+            IconButton(
+                onPressed: () {
+                  showMenu(
+                      shape: ContinuousRectangleBorder(
+                          borderRadius: BorderRadius.circular(24.0)),
                       context: context,
-                      builder: (context) => const ProfilePicture(),
-                    );
+                      position: RelativeRect.fromLTRB(
+                          MediaQuery.of(context).size.width * 0.13,
+                          0,
+                          MediaQuery.of(context).size.width * 0.12,
+                          0),
+                      items: [
+                        const PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit),
+                              SizedBox(width: 8.0),
+                              Text('Change Profile Picture'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          onTap: () {
+                            context.read<AuthBloc>().add(
+                                  const AuthEventLogout(),
+                                );
+                            final navigator = Navigator.of(context);
+                            if (navigator.canPop()) navigator.pop();
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(Icons.delete_forever),
+                              SizedBox(width: 8.0),
+                              Text('Delete Account'),
+                            ],
+                          ),
+                        ),
+                      ]);
+                },
+                icon: const Icon(Icons.more_vert))
+          ],
+        ),
+        body: SafeArea(
+          child: CustomPaint(
+            painter: BlueCirclePainter(),
+            child: Column(
+              children: <Widget>[
+                // upper margin
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                // Profile Picture Widget
+                StreamBuilder<AuthUser>(
+                    stream:
+                        context.select((ProfileBloc bloc) => bloc.userChange),
+                    builder: (context, snapshot) {
+                      return Hero(
+                        tag: 'User Profile',
+                        child: GestureDetector(
+                          onTap: () {
+                            context.read<ProfileBloc>().add(
+                                  ProfileEventShowProfilePic(
+                                      snapshot.data?.photo),
+                                );
+                          },
+                          child: CircleAvatar(
+                            radius:
+                                (MediaQuery.sizeOf(context).width * 0.3 < 120.0)
+                                    ? MediaQuery.sizeOf(context).width * 0.3
+                                    : 120.0,
+                            foregroundImage: (snapshot.data?.photo != null)
+                                ? NetworkImage(snapshot.data!.photo!)
+                                : null,
+                            child: const Icon(
+                              Icons.person,
+                              size: 170.0,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                // margin
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                // Email label
+                FutureBuilder(
+                    future:
+                        context.select((ProfileBloc bloc) => bloc.currentUser),
+                    builder: (context, snapshots) =>
+                        Text(snapshots.data?.email ?? '')),
+                // user Values container
+
+                FutureBuilder(
+                  future:
+                      context.select((ProfileBloc bloc) => bloc.currentUser),
+                  builder: (context, snapshots) {
+                    if (snapshots.hasData) {
+                      return ValueBox(user: snapshots.data);
+                    } else {
+                      return Container();
+                    }
                   },
-                  child: const CircleAvatar(
-                    radius: 90.0,
-                    child: Icon(
-                      Icons.person,
-                      size: 130.0,
-                    ),
-                  ),
                 ),
-              ),
-              // margin
-              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-              // Email label
-              const Text('Example.123@gmail.com'),
-              // user Values container
-              ValueBox(
-                  nameController: _nameController,
-                  infoController: _infoController)
-            ],
+              ],
+            ),
           ),
         ),
       ),
