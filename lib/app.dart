@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/loading_screen.dart';
-import 'package:gallary/pages/auth/view/google_signin.dart';
 import 'package:gallary/services/cloud/cloud.dart';
 
 import 'helpers/message_box.dart';

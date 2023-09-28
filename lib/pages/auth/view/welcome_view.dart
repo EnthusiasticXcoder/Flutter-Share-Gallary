@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:gallary/pages/auth/widget/widget.dart';
-import 'package:gallary/services/auth/bloc/auth_bloc.dart';
 import 'package:gallary/services/auth/bloc/bloc.dart';
 
 class WelcomeView extends StatelessWidget {
