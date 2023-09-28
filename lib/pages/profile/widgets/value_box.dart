@@ -77,43 +77,35 @@ class _ValueBoxState extends State<ValueBox> {
           return Future.value(true);
         },
         child: Column(
-          children: [
+          children: <Widget>[
             // Name field
-            TextFormField(
-              controller: _nameController,
-              onTapOutside: (event) {
-                FocusScope.of(context).unfocus();
-              },
-              style: const TextStyle(color: Colors.blueGrey),
-              validator: (value) =>
-                  (value == null || value.isEmpty) ? 'Required Field' : null,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.person),
-                label: const Text('Name'),
-                fillColor: Colors.grey.shade50,
-                filled: true,
-                hintStyle: const TextStyle(color: Colors.blueGrey),
-              ),
-            ),
-
+            textInputField(context, Icons.person, 'Name'),
             // margin
             SizedBox(height: MediaQuery.of(context).size.height * 0.03),
             // Info or status field
-            TextFormField(
-              controller: _infoController,
-              style: const TextStyle(color: Colors.blueGrey),
-              validator: (value) =>
-                  (value == null || value.isEmpty) ? 'Required Field' : null,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.info_outline),
-                label: const Text('Info or Status'),
-                fillColor: Colors.grey.shade50,
-                filled: true,
-                hintStyle: const TextStyle(color: Colors.blueGrey),
-              ),
-            ),
+            textInputField(context, Icons.info_outline, 'Info or Status'),
           ],
         ),
+      ),
+    );
+  }
+
+  TextFormField textInputField(
+      BuildContext context, IconData icon, String label) {
+    return TextFormField(
+      controller: _nameController,
+      onTapOutside: (event) {
+        FocusScope.of(context).unfocus();
+      },
+      style: const TextStyle(color: Colors.blueGrey),
+      validator: (value) =>
+          (value == null || value.isEmpty) ? 'Required Field' : null,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon),
+        label: Text(label),
+        fillColor: Colors.grey.shade50,
+        filled: true,
+        hintStyle: const TextStyle(color: Colors.blueGrey),
       ),
     );
   }
