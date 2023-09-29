@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/profile/profile_pic.dart';
+import 'package:gallary/pages/home/widgets/add_group.dart';
 
 import 'package:gallary/routs/app_routs.dart';
 import 'package:gallary/services/cloud/bloc/bloc.dart';
@@ -10,61 +11,94 @@ class GroupList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Iterable<Future<GroupData>>>(
-      stream: context.select((CloudBloc bloc) => bloc.allUserGroups),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final groupList = snapshot.data;
-          return ListView.builder(
-            itemCount: groupList?.length,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) => FutureBuilder<GroupData>(
-              future: groupList?.elementAt(index),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final groupData = snapshot.data;
-
-                  return ListTile(
-                    onTap: () {
-                      Navigator.of(context).pushNamed(AppRouts.groupPage,
-                          arguments: groupData?.id);
-                    },
-                    leading: InkWell(
-                      onTap: () {
-                        // showDialog(
-                        //   context: context,
-                        //   builder: (context) => const ProfilePicture(),
-                        // );
-
-                        ProfilePicture.showImageView(
-                            context, groupData?.imageURL, Icons.group);
-                      },
-                      child: CircleAvatar(
-                        foregroundImage: (groupData?.imageURL == null)
-                            ? null
-                            : NetworkImage(groupData!.imageURL!),
-                        child: const Icon(Icons.group),
-                      ),
-                    ),
-                    title: Text(
-                      groupData?.name ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(groupData?.info ?? ''),
-                    trailing: Text(formateDate(groupData?.dateTime)),
-                  );
-                } else {
-                  // loading screen
-                  return Container();
-                }
-              },
-            ),
-          );
-        } else {
-          // circular progress
-          return Container();
+    return BlocListener<CloudBloc, CloudState>(
+      listener: (context, state) {
+        if (state is CloudStateCreateGroup) {
+          AddGroupBottomSheet.showAddBottomSheet(context);
+        } else if (state is CloudStateGroupAdded) {
+          AddGroupBottomSheet.showAddedBottomSheet(context, state.id);
         }
       },
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.read<CloudBloc>().add(
+                  const CloudEventAddAGroup(),
+                );
+          },
+          backgroundColor: Colors.lightBlueAccent,
+          elevation: 10,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.group_add,
+            size: 25,
+          ),
+        ),
+        body: StreamBuilder<Iterable<Future<GroupData>>>(
+          stream: context.select((CloudBloc bloc) => bloc.allUserGroups),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final groupList = snapshot.data;
+              return ListView.builder(
+                itemCount: groupList?.length,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) => FutureBuilder<GroupData>(
+                  future: groupList?.elementAt(index),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return groupTile(context, snapshot.data);
+                    } else {
+                      // loading screen
+                      return Container();
+                    }
+                  },
+                ),
+              );
+            } else {
+              // circular progress
+              return Container();
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  ListTile groupTile(BuildContext context, GroupData? groupData) {
+    return ListTile(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AppRouts.groupPage,
+          arguments: groupData?.id,
+        );
+      },
+      leading: InkWell(
+        onTap: () {
+          // showDialog(
+          //   context: context,
+          //   builder: (context) => const ProfilePicture(),
+          // );
+
+          ProfilePicture.showImageView(
+            context,
+            groupData?.imageURL,
+            Icons.group,
+          );
+        },
+        child: CircleAvatar(
+          foregroundImage: (groupData?.imageURL == null)
+              ? null
+              : NetworkImage(groupData!.imageURL!),
+          child: const Icon(Icons.group),
+        ),
+      ),
+      title: Text(
+        groupData?.name ?? '',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(groupData?.info ?? ''),
+      trailing: Text(formateDate(groupData?.dateTime)),
     );
   }
 
@@ -80,7 +114,7 @@ class GroupList extends StatelessWidget {
           )
           .split(':')
           .sublist(0, 2)
-          .join();
+          .join(':');
     }
   }
 }
