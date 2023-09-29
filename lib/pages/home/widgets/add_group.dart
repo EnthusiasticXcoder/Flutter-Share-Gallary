@@ -99,6 +99,7 @@ class AddGroupBottomSheet {
             ElevatedButton(
               onPressed: () {
                 if (_joinformkey.currentState!.validate()) {
+                  Navigator.pop(context);
                   context.read<CloudBloc>().add(
                         CloudEventAddAGroup(groupId: _groupId),
                       );
