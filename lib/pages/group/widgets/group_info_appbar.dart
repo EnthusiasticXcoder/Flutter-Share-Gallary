@@ -21,15 +21,22 @@ class GroupInfoAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => Navigator.pop(context),
         style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 5.0)),
-        child: const Row(
+        child: Row(
           children: <Widget>[
-            BackButtonIcon(),
-            Hero(
-              tag: 'CircularProfileIcon',
-              child: CircleAvatar(
-                child: Icon(Icons.group),
-              ),
-            )
+            const BackButtonIcon(),
+            StreamBuilder<GroupData>(
+                stream: stream,
+                builder: (context, snapshot) {
+                  return Hero(
+                    tag: 'CircularProfileIcon',
+                    child: CircleAvatar(
+                      foregroundImage: (snapshot.data?.imageURL != null)
+                          ? NetworkImage(snapshot.data!.imageURL!)
+                          : null,
+                      child: const Icon(Icons.group),
+                    ),
+                  );
+                })
           ],
         ),
       ),
