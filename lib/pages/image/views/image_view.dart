@@ -46,17 +46,9 @@ class _DetailsPageState extends State<DetailsPage>
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        // ignore: sort_child_properties_last
-        child: Transform.translate(
-          offset: Offset(0, -100 * animation.value),
-          child: AppBar(
-            toolbarHeight: 60,
-            iconTheme: const IconThemeData(size: 30, color: Colors.white),
-            backgroundColor: Colors.black.withOpacity(0.7),
-          ),
-        ),
-        preferredSize: const Size(0, 60),
+      appBar: AnimatedAppbar(
+        animation: animation,
+        title: widget.image.title,
       ),
       body: InteractiveViewer(
         transformationController: _transformationController,
@@ -65,15 +57,43 @@ class _DetailsPageState extends State<DetailsPage>
         },
         child: ImageBox(
           image: widget.image,
-      
           transformationController: _transformationController,
           animationcontroller: _animationController,
         ),
       ),
-      bottomNavigationBar: Transform.translate(
-        offset: Offset(0, 260 * animation.value),
-        child: const DetailsBox(),
+      bottomNavigationBar: DetailsBox(
+        animation: animation,
+        image: widget.image,
       ),
     );
   }
+}
+
+class AnimatedAppbar extends StatelessWidget implements PreferredSizeWidget {
+  const AnimatedAppbar({
+    super.key,
+    required this.animation,
+    required this.title,
+  });
+
+  final String? title;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(0, -100 * animation.value),
+      child: AppBar(
+        toolbarHeight: 60,
+        centerTitle: true,
+        title: Text(title ?? ''),
+        iconTheme: const IconThemeData(size: 30, color: Colors.white),
+        backgroundColor: Colors.black.withOpacity(0.7),
+        foregroundColor: Colors.white,
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size(0, 60);
 }

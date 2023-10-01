@@ -71,30 +71,17 @@ class _ImageBoxState extends State<ImageBox>
         _zoomcontroller.forward(from: 0);
       },
       // Image to be displayed
-      child: SizedBox(
-          height: double.infinity,
-          width: double.maxFinite,
-          child: Image(
-              loadingBuilder: (context, child, loading) => Container(
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(15)),
-                    child: child,
-                  ),
-              errorBuilder: (context, __, _) => Container(
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(15)),
-                    child: const Center(
-                        child: Text('Error! Unable To Load Image')),
-                  ),
-              frameBuilder: (context, child, __, _) => Hero(
-                    tag: 'logo${widget.image.id}',
-                    child: child,
-                  ),
-              image: PhotoProvider(mediumId: widget.image.id))),
+      child: Hero(
+        tag: 'logo${widget.image.id}',
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            image: DecorationImage(
+              image: PhotoProvider(mediumId: widget.image.id),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
