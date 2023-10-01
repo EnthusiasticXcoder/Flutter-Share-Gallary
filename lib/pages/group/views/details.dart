@@ -1,29 +1,239 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gallary/helpers/profile/profile_pic.dart';
+import 'package:gallary/helpers/profile/show_image_picker.dart';
 import 'package:gallary/services/cloud/bloc/bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class GroupDetails extends StatelessWidget {
-  final String groupId;
-  const GroupDetails({super.key, required this.groupId});
+  final GroupData groupData;
+  const GroupDetails({super.key, required this.groupData});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        actions: <IconButton>[
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => Container(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      // margin
+                      SizedBox(
+                          height: MediaQuery.sizeOf(context).height * 0.01),
+                      const Text(
+                        'GroupId',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+
+                      // margin
+                      SizedBox(
+                          height: MediaQuery.sizeOf(context).height * 0.01),
+                      TextFormField(
+                        initialValue: groupData.id,
+                        readOnly: true,
+                      ),
+
+                      // margin
+                      SizedBox(
+                          height: MediaQuery.sizeOf(context).height * 0.05),
+                    ],
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.qr_code_2),
+          ),
+          IconButton(
+            onPressed: () {
+              showMenu(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0)),
+                context: context,
+                position: RelativeRect.fromLTRB(
+                    MediaQuery.of(context).size.width * 0.13,
+                    0,
+                    MediaQuery.of(context).size.width * 0.12,
+                    0),
+                items: <PopupMenuItem>[
+                  // change profile pic
+                  PopupMenuItem(
+                    onTap: () {
+                      showImagePicker(
+                        context: context,
+                        onDeletePic: () {
+                          Navigator.pop(context);
+                          context.read<CloudBloc>().add(
+                                CloudEventUpdateGroupProfile(
+                                  groupId: groupData.id,
+                                  deleteImage: true,
+                                ),
+                              );
+                        },
+                        oncameraPic: () {
+                          context.read<CloudBloc>().add(
+                                CloudEventUpdateGroupProfile(
+                                  groupId: groupData.id,
+                                  source: ImageSource.camera,
+                                ),
+                              );
+                        },
+                        onGallaryPic: () {
+                          context.read<CloudBloc>().add(
+                                CloudEventUpdateGroupProfile(
+                                  groupId: groupData.id,
+                                  source: ImageSource.gallery,
+                                ),
+                              );
+                        },
+                      );
+                    },
+                    child: const Row(
+                      children: <Widget>[
+                        Icon(Icons.edit),
+                        SizedBox(width: 8.0),
+                        Text('Change Profile Picture'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      final formkey = GlobalKey<FormState>();
+                      String? groupName;
+                      String? groupInfo;
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Edit Group'),
+                          content: Form(
+                            key: formkey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                // margin
+                                SizedBox(
+                                    height: MediaQuery.sizeOf(context).height *
+                                        0.01),
+                                // confirm new password field
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                      label: Text('Group Name')),
+                                  onChanged: (value) => groupName = value,
+                                  validator: (value) =>
+                                      (value == null || value.isEmpty)
+                                          ? 'Required Field'
+                                          : null,
+                                ), // margin
+                                SizedBox(
+                                    height: MediaQuery.sizeOf(context).height *
+                                        0.01),
+                                // confirm new password field
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                      label: Text('Group Info')),
+                                  onChanged: (value) => groupInfo = value,
+                                  validator: (value) =>
+                                      (value == null || value.isEmpty)
+                                          ? 'Required Field'
+                                          : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                          actionsAlignment: MainAxisAlignment.spaceEvenly,
+                          actions: <ElevatedButton>[
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.lightBlue,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Clear'),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.lightBlue,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                if (formkey.currentState!.validate()) {
+                                  context.read<CloudBloc>().add(
+                                        CloudEventUpdateGroupData(
+                                          groupId: groupData.id,
+                                          groupName: groupName,
+                                          groupInfo: groupInfo,
+                                        ),
+                                      );
+                                }
+                              },
+                              child: const Text('Confirm'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Row(
+                      children: <Widget>[
+                        Icon(Icons.edit_document),
+                        SizedBox(width: 8.0),
+                        Text('Edit Group'),
+                      ],
+                    ),
+                  ),
+                  (groupData.isUserAdmin)
+                      ? PopupMenuItem(
+                          onTap: () {
+                            context.read<CloudBloc>().add(
+                                  CloudEventDeleteGroup(groupData.id),
+                                );
+
+                            final navigator = Navigator.of(context);
+
+                            navigator.popUntil((route) => !navigator.canPop());
+                          },
+                          child: const Row(
+                            children: <Widget>[
+                              Icon(Icons.delete_forever),
+                              SizedBox(width: 8.0),
+                              Text('Delete Group'),
+                            ],
+                          ),
+                        )
+                      : PopupMenuItem(child: Container()),
+                ],
+              ).then((value) => context.read<CloudBloc>().add(
+                    const CloudEventInitial(),
+                  ));
+            },
+            icon: const Icon(Icons.more_vert),
+          ),
+        ],
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Profile Picture Widget
           StreamBuilder<GroupData>(
               stream: context
-                  .select((CloudBloc bloc) => bloc.getGroupData(groupId)),
-              builder: (context, snapshot) => imageDisplay(context, snapshot)),
+                  .select((CloudBloc bloc) => bloc.getGroupData(groupData.id)),
+              builder: (context, snapshot) =>
+                  imageDisplay(context, snapshot.data)),
           // Margin
           const SizedBox(height: 18),
           // Group Name
           StreamBuilder<GroupData>(
               stream: context
-                  .select((CloudBloc bloc) => bloc.getGroupData(groupId)),
+                  .select((CloudBloc bloc) => bloc.getGroupData(groupData.id)),
               builder: (context, snapshot) {
                 return Text(
                   snapshot.data?.name ?? '',
@@ -33,8 +243,8 @@ class GroupDetails extends StatelessWidget {
               }),
           // Number of Participents
           StreamBuilder<Iterable<Future<MembersData>>>(
-              stream:
-                  context.select((CloudBloc bloc) => bloc.getMembers(groupId)),
+              stream: context
+                  .select((CloudBloc bloc) => bloc.getMembers(groupData.id)),
               builder: (context, snapshot) {
                 return Text(
                   'Group : ${snapshot.data?.length ?? 0} Members',
@@ -46,7 +256,7 @@ class GroupDetails extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: StreamBuilder<Iterable<Future<MembersData>>>(
                 stream: context
-                    .select((CloudBloc bloc) => bloc.getMembers(groupId)),
+                    .select((CloudBloc bloc) => bloc.getMembers(groupData.id)),
                 builder: (context, snapshot) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -65,8 +275,8 @@ class GroupDetails extends StatelessWidget {
           // Members List
           Expanded(
             child: StreamBuilder<Iterable<Future<MembersData>>>(
-              stream:
-                  context.select((CloudBloc bloc) => bloc.getMembers(groupId)),
+              stream: context
+                  .select((CloudBloc bloc) => bloc.getMembers(groupData.id)),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final memberList = snapshot.data;
@@ -76,7 +286,7 @@ class GroupDetails extends StatelessWidget {
                       future: memberList?.elementAt(index),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          return memberTile(snapshot.data);
+                          return memberTile(context, snapshot.data);
                         } else {
                           return Container();
                         }
@@ -91,7 +301,14 @@ class GroupDetails extends StatelessWidget {
           ),
           // Delete Group
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              context.read<CloudBloc>().add(
+                    CloudEventRemoveGroupMember(groupData.id),
+                  );
+
+              final navigator = Navigator.of(context);
+              navigator.popUntil((route) => !navigator.canPop());
+            },
             label: const Text(
               'Exit Group',
               style: TextStyle(color: Colors.red),
@@ -106,13 +323,19 @@ class GroupDetails extends StatelessWidget {
     );
   }
 
-  ListTile memberTile(MembersData? memberData) {
+  ListTile memberTile(BuildContext context, MembersData? memberData) {
     return ListTile(
       onTap: () {
         // showDialog(
         //   context: context,
         //   builder: (context) => const ProfilePicture(),
         // );
+
+        ProfilePicture.showImageView(
+          context,
+          memberData.imageURL,
+          Icons.person,
+        );
       },
       leading: CircleAvatar(
           foregroundImage: (memberData?.imageURL != null)
@@ -146,7 +369,7 @@ class GroupDetails extends StatelessWidget {
     );
   }
 
-  Hero imageDisplay(BuildContext context, AsyncSnapshot<GroupData> snapshot) {
+  Hero imageDisplay(BuildContext context, GroupData? groupData) {
     return Hero(
       tag: 'CircularProfileIcon',
       child: GestureDetector(
@@ -155,13 +378,50 @@ class GroupDetails extends StatelessWidget {
           //   context: context,
           //   builder: (context) => const ProfilePicture(),
           // );
+          if (groupData!.isUserAdmin) {
+            ProfilePicture.showDialog(
+              context,
+              groupData.imageURL,
+              Icons.group,
+              onDeletePic: () {
+                context.read<CloudBloc>().add(
+                      CloudEventUpdateGroupProfile(
+                        groupId: groupData.id,
+                        deleteImage: true,
+                      ),
+                    );
+              },
+              oncameraPic: () {
+                context.read<CloudBloc>().add(
+                      CloudEventUpdateGroupProfile(
+                        groupId: groupData.id,
+                        source: ImageSource.camera,
+                      ),
+                    );
+              },
+              onGallaryPic: () {
+                context.read<CloudBloc>().add(
+                      CloudEventUpdateGroupProfile(
+                        groupId: groupData.id,
+                        source: ImageSource.gallery,
+                      ),
+                    );
+              },
+            );
+          } else {
+            ProfilePicture.showImageView(
+              context,
+              groupData.imageURL,
+              Icons.group,
+            );
+          }
         },
         child: CircleAvatar(
           radius: (MediaQuery.sizeOf(context).width * 0.3 < 120.0)
               ? MediaQuery.sizeOf(context).width * 0.3
               : 120.0,
-          foregroundImage: (snapshot.data?.imageURL != null)
-              ? NetworkImage(snapshot.data!.imageURL!)
+          foregroundImage: (groupData?.imageURL != null)
+              ? NetworkImage(groupData!.imageURL!)
               : null,
           child: const Icon(
             Icons.group,

@@ -7,20 +7,20 @@ import '../../../services/cloud/bloc/bloc.dart';
 import '../widgets/widgets.dart';
 
 class GroupView extends StatelessWidget {
-  final String groupId;
-  const GroupView({super.key, required this.groupId});
+  final GroupData groupData;
+  const GroupView({super.key, required this.groupData});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade400,
       appBar: GroupInfoAppBar(
-        stream: context.select((CloudBloc bloc) => bloc.getGroupData(groupId)),
-        groupId: groupId,
+        stream: context.select((CloudBloc bloc) => bloc.getGroupData(groupData.id)),
+        groupId: groupData.id,
         onPress: () {
           Navigator.of(context).pushNamed(
             AppRouts.groupDetailsPage,
-            arguments: groupId,
+            arguments: groupData,
           );
         },
       ),
