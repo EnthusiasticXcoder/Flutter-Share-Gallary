@@ -4,7 +4,6 @@ import 'package:gallary/services/auth/auth.dart';
 import 'package:gallary/services/auth/auth_service.dart';
 import 'package:gallary/services/auth/profile/profile_bloc.dart';
 import 'package:gallary/services/cloud/cloud.dart';
-import 'package:photo_gallery/photo_gallery.dart';
 
 import '../app.dart';
 import '../pages/group/views/group_view.dart';
@@ -53,7 +52,7 @@ class AppRouts {
             create: (context) =>
                 CloudBloc(FirebaseFirestoreProvider(), FirebaseCloudStorage()),
             child: GroupView(
-              groupId: settings.arguments as String,
+              groupData: settings.arguments as GroupData,
             ),
           ),
         );
@@ -63,20 +62,14 @@ class AppRouts {
             create: (context) =>
                 CloudBloc(FirebaseFirestoreProvider(), FirebaseCloudStorage()),
             child: GroupDetails(
-              groupId: settings.arguments as String,
+              groupData: settings.arguments as GroupData,
             ),
           ),
         );
       case AppRouts.viewImagePage:
         return MaterialPageRoute(
           builder: (context) {
-            final args = settings.arguments as Map;
-            final image = args['Image'] as Medium;
-            final index = args['Index'] as int;
-            return DetailsPage(
-              image: image,
-              index: index,
-            );
+            return DetailsPage(image: settings.arguments as ImageData);
           },
         );
       default:
