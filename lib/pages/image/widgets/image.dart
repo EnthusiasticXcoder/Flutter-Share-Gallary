@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:photo_gallery/photo_gallery.dart' show Medium, PhotoProvider;
+import 'package:gallary/services/cloud/bloc/bloc.dart';
+import 'package:photo_gallery/photo_gallery.dart' show PhotoProvider;
 
 class ImageBox extends StatefulWidget {
   final TransformationController transformationController;
-  final Medium image;
-  final int index;
+  final ImageData image;
   final AnimationController animationcontroller;
 
   const ImageBox(
       {super.key,
       required this.image,
-      required this.index,
       required this.transformationController,
       required this.animationcontroller});
 
@@ -92,7 +91,7 @@ class _ImageBoxState extends State<ImageBox>
                         child: Text('Error! Unable To Load Image')),
                   ),
               frameBuilder: (context, child, __, _) => Hero(
-                    tag: 'logo${widget.index}',
+                    tag: 'logo${widget.image.id}',
                     child: child,
                   ),
               image: PhotoProvider(mediumId: widget.image.id))),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gallary/routs/app_routs.dart';
+import 'package:gallary/services/cloud/bloc/bloc.dart';
 import 'package:photo_gallery/photo_gallery.dart'
-    show Medium, MediumType, ThumbnailProvider;
+    show MediumType, ThumbnailProvider;
 
 class ImageGrid extends StatelessWidget {
-  final List<Medium> images;
+  final Iterable<ImageData> images;
   const ImageGrid({super.key, required this.images});
 
   @override
@@ -18,16 +19,13 @@ class ImageGrid extends StatelessWidget {
           mainAxisSpacing: 10,
         ),
         itemBuilder: (context, index) {
-          Medium image = images.elementAt(index);
+          ImageData image = images.elementAt(index);
           return InkWell(
               onTap: () {
                 if (image.mediumType == MediumType.image) {
                   Navigator.of(context).pushNamed(
                     AppRouts.viewImagePage,
-                    arguments: {
-                      'Image': image,
-                      'Index': index,
-                    },
+                    arguments: image,
                   );
                 } else if (image.mediumType == MediumType.video) {
                   ScaffoldMessenger.of(context)

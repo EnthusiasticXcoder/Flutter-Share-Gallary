@@ -3,6 +3,7 @@ import 'dart:math' show pi;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/pages/home/widgets/widgets.dart';
+import 'package:gallary/services/auth/auth.dart';
 import 'package:gallary/services/cloud/bloc/cloud_bloc.dart';
 
 class HomeView extends StatefulWidget {
@@ -23,7 +24,7 @@ class _HomeViewState extends State<HomeView>
   @override
   void initState() {
     context.read<CloudBloc>().add(
-          const CloudEventInitialiseImages(),
+          const CloudEventUpdateDatabase(),
         );
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200))
@@ -59,6 +60,12 @@ class _HomeViewState extends State<HomeView>
         }
       },
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          heroTag: ' ',
+          onPressed: () {
+            context.read<AuthBloc>().add(const AuthEventLogout());
+          },
+        ),
         extendBody: true,
         resizeToAvoidBottomInset: false,
         backgroundColor: const Color(0xFF17203A),

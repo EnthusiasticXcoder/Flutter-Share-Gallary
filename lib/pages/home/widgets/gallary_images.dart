@@ -8,20 +8,13 @@ class GallaryImages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CloudBloc, CloudState>(
-      buildWhen: (previous, current) => current is CloudStateImageGrid,
-      builder: (context, state) {
-        if (state is CloudStateImageGrid) {
-          return ImageGrid(images: state.images);
+    return StreamBuilder<Iterable<ImageData>>(
+      stream: context.select((CloudBloc bloc) => bloc.allImages),
+      builder: (context, snapshort) {
+        if (snapshort.hasData) {
+          return ImageGrid(images: snapshort.data!);
         } else {
-          context.read<CloudBloc>().add(
-                const CloudEventInitialiseImages(),
-              );
-
-          return Center(
-              child: CircularProgressIndicator(
-            semanticsLabel: '${state.runtimeType}',
-          ));
+          return Container();
         }
       },
     );
