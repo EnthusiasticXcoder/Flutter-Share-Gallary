@@ -35,7 +35,7 @@ class GroupList extends StatelessWidget {
             size: 25,
           ),
         ),
-        body: StreamBuilder<Iterable<Future<GroupData>>>(
+        body: StreamBuilder<Iterable<Stream<GroupData>>>(
           stream: context.select((CloudBloc bloc) => bloc.allUserGroups),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -43,8 +43,8 @@ class GroupList extends StatelessWidget {
               return ListView.builder(
                 itemCount: groupList?.length,
                 physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) => FutureBuilder<GroupData>(
-                  future: groupList?.elementAt(index),
+                itemBuilder: (context, index) => StreamBuilder<GroupData>(
+                  stream: groupList?.elementAt(index),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return groupTile(context, snapshot.data);
@@ -70,7 +70,7 @@ class GroupList extends StatelessWidget {
       onTap: () {
         Navigator.of(context).pushNamed(
           AppRouts.groupPage,
-          arguments: groupData?.id,
+          arguments: groupData,
         );
       },
       leading: InkWell(
