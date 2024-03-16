@@ -70,7 +70,7 @@ class ProfileMenu {
             await FirebaseAuth.instance.signOut();
             await GoogleSignIn().signOut().then((value) {
               context.read<ProfileBloc>().add(
-                    const ProfileEventExit(),
+                    const ProfileEventExit(isLoggedIn: false),
                   );
             });
           },

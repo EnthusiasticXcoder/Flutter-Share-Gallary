@@ -4,10 +4,7 @@ import 'package:gallary/services/auth/auth_user.dart';
 import 'package:gallary/services/auth/profile/profile_bloc.dart';
 
 class ValueBox extends StatefulWidget {
-  const ValueBox({
-    super.key,
-    this.user,
-  });
+  const ValueBox({super.key, this.user});
   final AuthUser? user;
 
   @override
@@ -17,7 +14,6 @@ class ValueBox extends StatefulWidget {
 class _ValueBoxState extends State<ValueBox> {
   late final TextEditingController _nameController;
   late final TextEditingController _infoController;
-  bool canpop = false;
   @override
   void initState() {
     _nameController = TextEditingController(text: widget.user?.name);
@@ -42,8 +38,7 @@ class _ValueBoxState extends State<ValueBox> {
           horizontal: MediaQuery.of(context).size.width * 0.04,
           vertical: MediaQuery.of(context).size.height * 0.02),
       padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.04,
-          vertical: MediaQuery.of(context).size.height * 0.05),
+          vertical: MediaQuery.of(context).size.height * 0.02),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         color: const Color.fromARGB(255, 240, 248, 251),
@@ -64,8 +59,9 @@ class _ValueBoxState extends State<ValueBox> {
       ),
       child: Form(
         key: _formkey,
-        canPop: canpop,
+        canPop: false,
         onPopInvoked: (didpop) {
+          if (didpop) return;
           final info = _infoController.text;
           final name = _nameController.text;
           if (_formkey.currentState!.validate() &&
@@ -73,40 +69,45 @@ class _ValueBoxState extends State<ValueBox> {
             context.read<ProfileBloc>().add(
                   ProfileEventUpdateUser(info: info, name: name),
                 );
-            canpop = false;
+          } else {
+            context.read<ProfileBloc>().add(const ProfileEventExit());
           }
-          canpop = true;
         },
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             // Name field
-            textInputField(context, Icons.person, 'Name'),
-            // margin
-            SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+            textInputField(context, Icons.person, 'Name', _nameController),
             // Info or status field
-            textInputField(context, Icons.info_outline, 'Info or Status'),
+            textInputField(
+                context, Icons.info_outline, 'Info or Status', _infoController),
           ],
         ),
       ),
     );
   }
 
-  TextFormField textInputField(
-      BuildContext context, IconData icon, String label) {
-    return TextFormField(
-      controller: _nameController,
-      onTapOutside: (event) {
-        FocusScope.of(context).unfocus();
-      },
-      style: const TextStyle(color: Colors.blueGrey),
-      validator: (value) =>
-          (value == null || value.isEmpty) ? 'Required Field' : null,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon),
-        label: Text(label),
-        fillColor: Colors.grey.shade50,
-        filled: true,
-        hintStyle: const TextStyle(color: Colors.blueGrey),
+  Widget textInputField(BuildContext context, IconData icon, String label,
+      TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.04,
+          vertical: MediaQuery.of(context).size.height * 0.01),
+      child: TextFormField(
+        controller: controller,
+        onTapOutside: (event) {
+          FocusScope.of(context).unfocus();
+        },
+        style: const TextStyle(color: Colors.blueGrey),
+        validator: (value) =>
+            (value == null || value.isEmpty) ? 'Required Field' : null,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon),
+          label: Text(label),
+          fillColor: Colors.grey.shade50,
+          filled: true,
+          hintStyle: const TextStyle(color: Colors.blueGrey),
+        ),
       ),
     );
   }
