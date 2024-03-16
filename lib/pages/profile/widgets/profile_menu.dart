@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/profile/show_image_picker.dart';
 import 'package:gallary/services/auth/profile/profile_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart' show ImageSource;
 
 class ProfileMenu {
@@ -59,6 +61,24 @@ class ProfileMenu {
               Icon(Icons.change_circle),
               SizedBox(width: 8.0),
               Text('Change Password'),
+            ],
+          ),
+        ),
+
+        PopupMenuItem(
+          onTap: () async {
+            await FirebaseAuth.instance.signOut();
+            await GoogleSignIn().signOut().then((value) {
+              context.read<ProfileBloc>().add(
+                    const ProfileEventExit(),
+                  );
+            });
+          },
+          child: const Row(
+            children: <Widget>[
+              Icon(Icons.logout),
+              SizedBox(width: 8.0),
+              Text('Log Out'),
             ],
           ),
         ),

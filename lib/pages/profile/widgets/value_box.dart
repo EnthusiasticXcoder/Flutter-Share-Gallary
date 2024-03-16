@@ -17,7 +17,7 @@ class ValueBox extends StatefulWidget {
 class _ValueBoxState extends State<ValueBox> {
   late final TextEditingController _nameController;
   late final TextEditingController _infoController;
-
+  bool canpop = false;
   @override
   void initState() {
     _nameController = TextEditingController(text: widget.user?.name);
@@ -64,7 +64,8 @@ class _ValueBoxState extends State<ValueBox> {
       ),
       child: Form(
         key: _formkey,
-        onWillPop: () {
+        canPop: canpop,
+        onPopInvoked: (didpop) {
           final info = _infoController.text;
           final name = _nameController.text;
           if (_formkey.currentState!.validate() &&
@@ -72,9 +73,9 @@ class _ValueBoxState extends State<ValueBox> {
             context.read<ProfileBloc>().add(
                   ProfileEventUpdateUser(info: info, name: name),
                 );
-            return Future.value(false);
+            canpop = false;
           }
-          return Future.value(true);
+          canpop = true;
         },
         child: Column(
           children: <Widget>[

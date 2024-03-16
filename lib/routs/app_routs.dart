@@ -21,6 +21,7 @@ class AppRouts {
   final AuthService _service = AuthService.firebase();
 
   Route? onGenerateRouts(RouteSettings settings) {
+    
     switch (settings.name) {
       case AppRouts.homePage:
         return MaterialPageRoute(

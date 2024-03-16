@@ -18,8 +18,8 @@ class LoadingScreen {
       context: context,
       builder: (context) {
         Size size = MediaQuery.sizeOf(context);
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(

@@ -82,23 +82,26 @@ class GroupList extends StatelessWidget {
 
           ProfilePicture.showImageView(
             context,
-            groupData?.imageURL,
+            groupData.imageURL,
             Icons.group,
           );
         },
-        child: CircleAvatar(
-          foregroundImage: (groupData?.imageURL == null)
-              ? null
-              : NetworkImage(groupData!.imageURL!),
-          child: const Icon(Icons.group),
+        child: Hero(
+          tag: groupData!.id,
+          child: CircleAvatar(
+            foregroundImage: (groupData.imageURL == null)
+                ? null
+                : NetworkImage(groupData.imageURL!),
+            child: const Icon(Icons.group),
+          ),
         ),
       ),
       title: Text(
-        groupData?.name ?? '',
+        groupData.name,
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
-      subtitle: Text(groupData?.info ?? ''),
-      trailing: Text(formateDate(groupData?.dateTime)),
+      subtitle: Text(groupData.info ),
+      trailing: Text(formateDate(groupData.dateTime)),
     );
   }
 

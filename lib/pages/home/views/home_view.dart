@@ -19,6 +19,7 @@ class _HomeViewState extends State<HomeView>
   late AnimationController _animationController;
   late Animation<double> scalAnimation;
   late Animation<double> animation;
+  bool canpop = false;
 
   @override
   void initState() {
@@ -48,25 +49,21 @@ class _HomeViewState extends State<HomeView>
   @override
   Widget build(BuildContext context) {
     double sidebarwidth = MediaQuery.sizeOf(context).width * 0.75;
-    return WillPopScope(
-      onWillPop: () {
+    return PopScope(
+      canPop: canpop,
+      onPopInvoked: (didpop) {
         if (isSideBarOpen) {
           _animationController.reverse();
           isSideBarOpen = !isSideBarOpen;
-          return Future.value(false);
+          canpop = false;
+          setState(() {});
         } else {
-          return Future.value(true);
+          canpop = true;
+          setState(() {});
         }
       },
       child: Scaffold(
-        // floatingActionButton: FloatingActionButton(
-        //   heroTag: ' ',
-        //   onPressed: () {
-        //     context.read<AuthBloc>().add(const AuthEventLogout());
-        //   },
-        // ),
         extendBody: true,
-        resizeToAvoidBottomInset: false,
         backgroundColor: const Color(0xFF17203A),
         body: Stack(
           children: [

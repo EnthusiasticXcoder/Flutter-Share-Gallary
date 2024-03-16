@@ -7,76 +7,96 @@ import 'package:photo_gallery/photo_gallery.dart'
 
 class ImageGrid extends StatelessWidget {
   final Iterable<ImageData> images;
-  const ImageGrid({super.key, required this.images});
+  const ImageGrid({
+    super.key,
+    required this.images,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    return GridView(
       padding: const EdgeInsets.all(8.0),
-      itemCount: images.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
-      itemBuilder: (context, index) {
-        ImageData image = images.elementAt(index);
-
-        return InkWell(
-          onTap: () {
-            if (image.mediumType == MediumType.image) {
-              Navigator.of(context).pushNamed(
-                AppRouts.viewImagePage,
-                arguments: image,
-              );
-            } else if (image.mediumType == MediumType.video) {
-              MessageBox.showMessage(context, image.mimeType ?? '');
-              // open video file
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: ThumbnailProvider(
-                  mediumId: image.id,
-                  highQuality: true,
+      children: images
+          .map(
+            (image) => InkWell(
+              onLongPress: () {
+                print(' to do ==============');
+                // Navigator.of(context).pushNamed(
+                //   AppRouts.selectionView,
+                //   arguments: {
+                //     'Images': images,
+                //     'Image': image,
+                //     'onSelect': () {
+                //       Navigator.of(context).pushNamed(
+                //         AppRouts.groupSelect,
+                //       );
+                //     }
+                //   },
+                // );
+              },
+              onTap: () {
+                if (image.mediumType == MediumType.image) {
+                  Navigator.of(context).pushNamed(
+                    AppRouts.viewImagePage,
+                    arguments: image,
+                  );
+                } else if (image.mediumType == MediumType.video) {
+                  MessageBox.showMessage(context, image.mimeType ?? '');
+                  // open video file
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: (image.imageURL != null)
+                        ? NetworkImage(image.imageURL!) as ImageProvider
+                        : ThumbnailProvider(mediumId: image.id),
+                  ),
+                  border: Border.all(
+                    color: (image.isSync) ? Colors.green : Colors.redAccent,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
                 ),
+                alignment: Alignment.topRight,
+                child: (image.mediumType == MediumType.video)
+                    ? videoDurationWidget(image)
+                    : Container(),
               ),
-              border: Border.all(
-                color: (image.isSync) ? Colors.green : Colors.redAccent,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(15),
             ),
-            alignment: Alignment.topRight,
-            child: (image.mediumType == MediumType.video)
-                ? Container(
-                    margin: const EdgeInsets.all(2.0),
-                    padding: const EdgeInsets.only(right: 4.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Icon(
-                          Icons.play_circle,
-                          color: Colors.white,
-                        ),
-                        Text(
-                          durationconvert(image.duration),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  )
-                : null,
+          )
+          .toList(),
+    );
+  }
+
+  Container videoDurationWidget(ImageData image) {
+    return Container(
+      margin: const EdgeInsets.all(2.0),
+      padding: const EdgeInsets.only(right: 4.0),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Icon(
+            Icons.play_circle,
+            color: Colors.white,
           ),
-        );
-      },
+          Text(
+            durationconvert(image.duration),
+            style: const TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 

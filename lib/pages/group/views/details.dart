@@ -226,8 +226,9 @@ class GroupDetails extends StatelessWidget {
           StreamBuilder<GroupData>(
               stream: context
                   .select((CloudBloc bloc) => bloc.getGroupData(groupData.id)),
-              builder: (context, snapshot) =>
-                  imageDisplay(context, snapshot.data)),
+              builder: (context, snapshot) => (snapshot.hasData)
+                  ? imageDisplay(context, snapshot.data)
+                  : imageDisplay(context, groupData)),
           // Margin
           const SizedBox(height: 18),
           // Group Name
@@ -371,7 +372,7 @@ class GroupDetails extends StatelessWidget {
 
   Hero imageDisplay(BuildContext context, GroupData? groupData) {
     return Hero(
-      tag: 'CircularProfileIcon',
+      tag: groupData?.id ?? '',
       child: GestureDetector(
         onTap: () {
           // showDialog(

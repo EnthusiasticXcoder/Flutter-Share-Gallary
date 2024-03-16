@@ -15,7 +15,7 @@ Future<void> showImagePicker({
         return ListView(
           shrinkWrap: true,
           padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
-          children: [
+          children: <Widget>[
             Center(
               child: Container(
                 width: 40,

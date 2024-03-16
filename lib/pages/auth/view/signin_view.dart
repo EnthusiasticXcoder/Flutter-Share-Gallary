@@ -15,12 +15,12 @@ class SignInView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool obscureText = true;
-    return WillPopScope(
-      onWillPop: () {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didpop) {
         context.read<AuthBloc>().add(
               const AuthEventLogout(),
             );
-        return Future.value(false);
       },
       child: PaintedScaffold(
         title: 'Sign In',

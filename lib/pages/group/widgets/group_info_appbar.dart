@@ -28,7 +28,7 @@ class GroupInfoAppBar extends StatelessWidget implements PreferredSizeWidget {
                 stream: stream,
                 builder: (context, snapshot) {
                   return Hero(
-                    tag: 'CircularProfileIcon',
+                    tag: groupId,
                     child: CircleAvatar(
                       foregroundImage: (snapshot.data?.imageURL != null)
                           ? NetworkImage(snapshot.data!.imageURL!)

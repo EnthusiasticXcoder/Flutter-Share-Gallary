@@ -20,12 +20,12 @@ class ForgotPasswordView extends StatelessWidget {
       },
       label:
           'Enter Your Email Below, We Will Send A Password Reset Mail To Your Email',
-      child: WillPopScope(
-        onWillPop: () {
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
           context.read<AuthBloc>().add(
                 const AuthEventSignIn(),
               );
-          return Future.value(false);
         },
         child: Form(
           key: _formKey,

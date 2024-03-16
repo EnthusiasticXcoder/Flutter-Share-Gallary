@@ -77,7 +77,9 @@ class _ImageBoxState extends State<ImageBox>
           decoration: BoxDecoration(
             color: Colors.black87,
             image: DecorationImage(
-              image: PhotoProvider(mediumId: widget.image.id),
+              image: (widget.image.imageURL == null)
+                  ? PhotoProvider(mediumId: widget.image.id)
+                  : NetworkImage(widget.image.imageURL!) as ImageProvider,
             ),
           ),
         ),

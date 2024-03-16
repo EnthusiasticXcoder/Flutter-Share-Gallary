@@ -9,12 +9,12 @@ class VerificationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didpop) {
         context.read<AuthBloc>().add(
               const AuthEventSignUp(),
             );
-        return Future.value(false);
       },
       child: PaintedScaffold(
         title: 'Email Verification',

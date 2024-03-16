@@ -19,12 +19,12 @@ class GoogleSigninView extends StatelessWidget {
               const AuthEventLogout(),
             );
       },
-      child: WillPopScope(
-        onWillPop: () {
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didpop) {
           context.read<AuthBloc>().add(
                 const AuthEventLogout(),
               );
-          return Future.value(false);
         },
         child: Form(
           key: _formKey,
