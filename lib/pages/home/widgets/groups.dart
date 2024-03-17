@@ -50,7 +50,11 @@ class GroupList extends StatelessWidget {
                       return groupTile(context, snapshot.data);
                     } else {
                       // loading screen
-                      return const ListTile(tileColor: Colors.grey);
+                      return ListTile(
+                        tileColor: Colors.grey,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0)),
+                      );
                     }
                   },
                 ),

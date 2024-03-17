@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/image/image_grid.dart';
 import 'package:gallary/helpers/message_box.dart';
+import 'package:gallary/helpers/profile/profile_pic.dart';
 import 'package:gallary/routs/app_routs.dart';
 import 'package:gallary/services/cloud/cloud.dart';
 import 'package:photo_gallery/photo_gallery.dart';
@@ -198,7 +199,7 @@ class ImageChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final images = formatImageShape(chatMessage.data);
+    final images = formatImageShape(chatMessage.data, chatMessage.itemCount);
     return Container(
       margin: const EdgeInsets.only(top: 25.0),
       decoration: BoxDecoration(
@@ -209,52 +210,93 @@ class ImageChatBubble extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          FutureBuilder<MembersData>(
-              future: chatMessage.senderInfo,
-              builder: (context, snapshot) {
-                return ListTile(
-                  leading: InkWell(
-                    onTap: () {},
-                    child: CircleAvatar(
-                      foregroundImage: (snapshot.data?.imageURL == null)
-                          ? null
-                          : NetworkImage(snapshot.data!.imageURL!),
-                      child: const Icon(Icons.person),
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              FutureBuilder<MembersData>(
+                  future: chatMessage.senderInfo,
+                  builder: (context, snapshot) {
+                    return ListTile(
+                      leading: InkWell(
+                        onTap: () {
+                          ProfilePicture.showImageView(
+                            context,
+                            snapshot.data?.imageURL,
+                            Icons.person,
+                          );
+                        },
+                        child: CircleAvatar(
+                          foregroundImage: (snapshot.data?.imageURL == null)
+                              ? null
+                              : NetworkImage(snapshot.data!.imageURL!),
+                          child: const Icon(Icons.person),
+                        ),
+                      ),
+                      title: Text(
+                        snapshot.data?.name ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(snapshot.data?.info ?? ''),
+                      trailing: Text(formateDate(chatMessage.date)),
+                    );
+                  }),
+              if (chatMessage.message?.isNotEmpty ?? false)
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.all(8.0).copyWith(top: 0.0),
+                  decoration: BoxDecoration(
+                      color: Colors.lightBlueAccent.shade100.withAlpha(100),
+                      borderRadius: BorderRadius.circular(8.0)),
+                  child: RichText(
+                    textAlign: TextAlign.justify,
+                    text: TextSpan(
+                      text: chatMessage.message,
+                      style: const TextStyle(color: Colors.black, fontSize: 15),
                     ),
                   ),
-                  title: Text(
-                    snapshot.data?.name ?? '',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(snapshot.data?.info ?? ''),
-                  trailing: Text(formateDate(chatMessage.date)),
-                );
-              }),
-          if (chatMessage.message?.isNotEmpty ?? false)
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              margin: const EdgeInsets.all(8.0).copyWith(top: 0.0),
-              decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent.shade100.withAlpha(100),
-                  borderRadius: BorderRadius.circular(8.0)),
-              child: RichText(
-                textAlign: TextAlign.justify,
-                text: TextSpan(
-                  text: chatMessage.message,
-                  style: const TextStyle(color: Colors.black, fontSize: 15),
                 ),
-              ),
+              (images.firstOrNull?.length == 1)
+                  ? FutureBuilder<dynamic>(
+                      future: images.firstOrNull?.firstOrNull,
+                      builder: (context, snapshot) => ThumbnailGridImage(
+                          image: snapshot.data,
+                          size: 350,
+                          chatId: chatMessage.id))
+                  : ImageGridLayout(images: images, chatId: chatMessage.id),
+              const SizedBox(height: 5.0)
+            ],
+          ),
+          Container(
+            height: 25,
+            padding: const EdgeInsets.all(4.0),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12.0),
+                  bottomRight: Radius.circular(12.0)),
+              color: Colors.white,
             ),
-          (images.firstOrNull?.length == 1)
-              ? FutureBuilder<dynamic>(
-                  future: images.firstOrNull?.firstOrNull,
-                  builder: (context, snapshot) => ThumbnailGridImage(
-                      image: snapshot.data, size: 350, chatId: chatMessage.id))
-              : ImageGridLayout(images: images, chatId: chatMessage.id),
-          const SizedBox(height: 5.0)
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                (chatMessage.data.length == chatMessage.itemCount)
+                    ? const SizedBox.shrink()
+                    : Text(
+                        '(${chatMessage.data.length}/${chatMessage.itemCount}) Uploaded '),
+                (chatMessage.data.length == chatMessage.itemCount)
+                    ? const Icon(Icons.check,
+                        color: Colors.lightBlueAccent, size: 18)
+                    : const SizedBox(
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.lightBlueAccent,
+                        )),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -276,9 +318,13 @@ class ImageChatBubble extends StatelessWidget {
     }
   }
 
-  List<List<Future<dynamic>>> formatImageShape(dynamic images) {
+  List<List<Future<dynamic>>> formatImageShape(dynamic images, int? itemCount) {
+    itemCount = itemCount ?? images.length;
     final tempImages = [];
     tempImages.addAll(images);
+    // adding dummy data
+    tempImages.addAll(List.generate((itemCount! - images.length).toInt(),
+        (index) async => ImageData(id: '$index', isSync: false)));
     List<List<Future<dynamic>>> formatedImages = [];
     while (tempImages.isNotEmpty) {
       switch (tempImages.length) {
@@ -559,7 +605,13 @@ class MessageChatBubble extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.only(left: (sendByMe) ? 42.0 : 2.0),
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            ProfilePicture.showImageView(
+                              context,
+                              snapshot.data?.imageURL,
+                              Icons.person,
+                            );
+                          },
                           child: CircleAvatar(
                             radius: 8,
                             foregroundImage: (chatMember?.imageURL == null)
