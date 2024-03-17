@@ -74,6 +74,9 @@ class _GroupSelectionState extends State<GroupSelection> {
                     shape: const CircleBorder(),
                     fixedSize: const Size.fromRadius(25)),
                 onPressed: () {
+                  context.read<CloudBloc>().add(
+                        CloudEventAddimagesToGroups(groupIds: selectedGroup),
+                      );
                   final navigator = Navigator.of(context);
                   navigator.popUntil((route) => !navigator.canPop());
                   MessageBox.showMessage(context,
