@@ -67,7 +67,7 @@ class GroupView extends StatelessWidget {
                       }).toList(),
                     );
                   } else {
-                    return Container();
+                    return const CircularProgressIndicator();
                   }
                 }),
           ),

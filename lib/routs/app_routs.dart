@@ -43,7 +43,7 @@ class AppRouts {
             providers: [
               BlocProvider(
                 create: (context) =>
-                    ProfileBloc(_service, FirebaseCloudStorage()),
+                    ProfileBloc(_service, FirebaseFirestoreProvider(), FirebaseCloudStorage()),
               ),
               BlocProvider.value(value: settings.arguments as AuthBloc),
             ],
