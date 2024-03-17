@@ -6,11 +6,10 @@ import 'package:photo_gallery/photo_gallery.dart'
     show MediumType, ThumbnailProvider;
 
 class ImageGrid extends StatelessWidget {
+  const ImageGrid({super.key, required this.images, this.showBorder = true});
+
   final Iterable<ImageData> images;
-  const ImageGrid({
-    super.key,
-    required this.images,
-  });
+  final bool showBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -25,22 +24,22 @@ class ImageGrid extends StatelessWidget {
           .map(
             (image) => InkWell(
               onLongPress: () {
-                print(' to do ==============');
-                // Navigator.of(context).pushNamed(
-                //   AppRouts.selectionView,
-                //   arguments: {
-                //     'Images': images,
-                //     'Image': image,
-                //     'onSelect': () {
-                //       Navigator.of(context).pushNamed(
-                //         AppRouts.groupSelect,
-                //       );
-                //     }
-                //   },
-                // );
+                Navigator.of(context).pushNamed(
+                  AppRouts.selectionView,
+                  arguments: {
+                    'Images': images,
+                    'Image': image,
+                    'onSelect': () {
+                      Navigator.of(context).pushNamed(
+                        AppRouts.groupSelect,
+                      );
+                    }
+                  },
+                );
               },
               onTap: () {
                 if (image.mediumType == MediumType.image) {
+                  image.tag = 'logo${image.id}';
                   Navigator.of(context).pushNamed(
                     AppRouts.viewImagePage,
                     arguments: image,
@@ -50,24 +49,30 @@ class ImageGrid extends StatelessWidget {
                   // open video file
                 }
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: (image.imageURL != null)
-                        ? NetworkImage(image.imageURL!) as ImageProvider
-                        : ThumbnailProvider(mediumId: image.id),
+              child: Hero(
+                tag: 'logo${image.id}',
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: (image.imageURL != null)
+                          ? NetworkImage(image.imageURL!) as ImageProvider
+                          : ThumbnailProvider(mediumId: image.id),
+                    ),
+                    border: (showBorder)
+                        ? Border.all(
+                            color: (image.isSync)
+                                ? Colors.green
+                                : Colors.redAccent,
+                            width: 1.5)
+                        : null,
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  border: Border.all(
-                    color: (image.isSync) ? Colors.green : Colors.redAccent,
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(15),
+                  alignment: Alignment.topRight,
+                  child: (image.mediumType == MediumType.video)
+                      ? videoDurationWidget(image)
+                      : Container(),
                 ),
-                alignment: Alignment.topRight,
-                child: (image.mediumType == MediumType.video)
-                    ? videoDurationWidget(image)
-                    : Container(),
               ),
             ),
           )

@@ -50,14 +50,14 @@ class GroupList extends StatelessWidget {
                       return groupTile(context, snapshot.data);
                     } else {
                       // loading screen
-                      return Container();
+                      return const ListTile(tileColor: Colors.grey);
                     }
                   },
                 ),
               );
             } else {
               // circular progress
-              return Container();
+              return const Center(child: CircularProgressIndicator());
             }
           },
         ),
@@ -100,7 +100,7 @@ class GroupList extends StatelessWidget {
         groupData.name,
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
-      subtitle: Text(groupData.info ),
+      subtitle: Text(groupData.info),
       trailing: Text(formateDate(groupData.dateTime)),
     );
   }

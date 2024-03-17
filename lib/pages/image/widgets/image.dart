@@ -72,7 +72,7 @@ class _ImageBoxState extends State<ImageBox>
       },
       // Image to be displayed
       child: Hero(
-        tag: 'logo${widget.image.id}',
+        tag: widget.image.tag ?? "",
         child: Container(
           decoration: BoxDecoration(
             color: Colors.black87,

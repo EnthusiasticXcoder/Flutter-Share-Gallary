@@ -77,7 +77,7 @@ class _GroupSelectionState extends State<GroupSelection> {
                   final navigator = Navigator.of(context);
                   navigator.popUntil((route) => !navigator.canPop());
                   MessageBox.showMessage(context,
-                      'Images Added To Groups, ${selectedGroup.map((e) => e.name).join(', ')}');
+                      'Images Added To Groups : ${selectedGroup.map((e) => e.name).join(', ')}');
                 },
                 icon: const Icon(Icons.send),
               ),
