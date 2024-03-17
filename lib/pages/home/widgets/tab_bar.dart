@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gallary/helpers/shaders/circle_shader.dart';
+import 'package:gallary/helpers/shaders/gradient_shader.dart';
 
 class TabBarWidget extends StatefulWidget {
   final List<String> tabs;
@@ -33,7 +33,7 @@ class _TabBarWidgetState extends State<TabBarWidget>
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: BlueCirclePainter(),
+      painter: GradientPainter(),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(

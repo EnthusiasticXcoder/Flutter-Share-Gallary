@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/image/image_grid.dart';
 import 'package:gallary/helpers/message_box.dart';
 import 'package:gallary/helpers/profile/profile_pic.dart';
+import 'package:gallary/helpers/shaders/gradient_shader.dart';
 import 'package:gallary/routs/app_routs.dart';
 import 'package:gallary/services/cloud/cloud.dart';
 import 'package:photo_gallery/photo_gallery.dart';
@@ -15,153 +16,158 @@ class GroupView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.lightBlue.shade400,
-      appBar: GroupInfoAppBar(
-        stream:
-            context.select((CloudBloc bloc) => bloc.getGroupData(groupData.id)),
-        groupId: groupData.id,
-        onPress: () {
-          Navigator.of(context).pushNamed(
-            AppRouts.groupDetailsPage,
-            arguments: groupData,
-          );
-        },
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
+    return CustomPaint(
+      painter: GradientPainter(),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: GroupInfoAppBar(
+          stream: context
+              .select((CloudBloc bloc) => bloc.getGroupData(groupData.id)),
+          groupId: groupData.id,
+          onPress: () {
+            Navigator.of(context).pushNamed(
+              AppRouts.groupDetailsPage,
+              arguments: groupData,
+            );
+          },
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 80),
-          child: StreamBuilder<Iterable<GroupChatMessage>>(
-              stream: context
-                  .select((CloudBloc bloc) => bloc.getGroupChats(groupData.id)),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return ListView(
-                    reverse: true,
-                    children: snapshot.data!.map<Widget>((item) {
-                      switch (item.type) {
-                        case infoType:
-                          return _infoCardChatBubble(item);
-                        case messageType:
-                          String? userId = context
-                              .select((CloudBloc bloc) => bloc.currentUserId);
-
-                          return MessageChatBubble(
-                              chatMessage: item, userId: userId);
-                        case imageType:
-                          return ImageChatBubble(chatMessage: item);
-                        default:
-                          return Container();
-                      }
-                    }).toList(),
-                  );
-                } else {
-                  return Container();
-                }
-              }),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          BlocBuilder<CloudBloc, CloudState>(
-            buildWhen: (previous, current) => current is CloudStateInitial,
-            builder: (context, state) {
-              if (state is CloudStateInitial &&
-                  (state.selectedImages?.isNotEmpty ?? false)) {
-                double height = _getContainerHeight(
-                    state.selectedImages!.length,
-                    MediaQuery.sizeOf(context).height);
-
-                return Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  height: height,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    image: (state.selectedImages!.length == 1)
-                        ? DecorationImage(
-                            fit: BoxFit.cover,
-                            image: PhotoProvider(
-                                mediumId: state.selectedImages!.first.id))
-                        : null,
-                    boxShadow: [
-                      BoxShadow(color: Colors.lightBlue.shade50),
-                    ],
-                    color: Colors.white54,
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                              '(${state.selectedImages!.length}) Select Images'),
-                          IconButton(
-                              onPressed: () {
-                                context.read<CloudBloc>().add(
-                                      const CloudEventShareImage(clear: true),
-                                    );
-                                context.read<CloudBloc>().add(
-                                      const CloudEventInitial(hasImages: true),
-                                    );
-                              },
-                              style: IconButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.blueGrey),
-                              icon: const Icon(Icons.clear))
-                        ],
-                      ),
-                      if (state.selectedImages!.length > 1)
-                        Expanded(
-                          child: ImageGrid(
-                              images: state.selectedImages!, showBorder: false),
-                        ),
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
+        body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
           ),
-          StreamBuilder<Iterable<ImageData>>(
-              stream: context.select((CloudBloc bloc) => bloc.allImages),
-              builder: (context, snapshot) {
-                return SendImageTextField(
-                  onSendMessage: (value) {
-                    context.read<CloudBloc>().add(CloudEventSendMessage(
-                        groupId: groupData.id, message: value));
-                  },
-                  onSelectGallary: () async {
-                    final Iterable<ImageData> images = snapshot.data ?? [];
-                    Navigator.of(context).pushNamed(
-                      AppRouts.selectionView,
-                      arguments: {
-                        'Images': images,
-                        'Image': null,
-                        'onSelect': () {
-                          context.read<CloudBloc>().add(
-                                const CloudEventInitial(hasImages: true),
-                              );
-                          Navigator.pop(context);
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 80),
+            child: StreamBuilder<Iterable<GroupChatMessage>>(
+                stream: context.select(
+                    (CloudBloc bloc) => bloc.getGroupChats(groupData.id)),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView(
+                      reverse: true,
+                      children: snapshot.data!.map<Widget>((item) {
+                        switch (item.type) {
+                          case infoType:
+                            return _infoCardChatBubble(item);
+                          case messageType:
+                            String? userId = context
+                                .select((CloudBloc bloc) => bloc.currentUserId);
+
+                            return MessageChatBubble(
+                                chatMessage: item, userId: userId);
+                          case imageType:
+                            return ImageChatBubble(chatMessage: item);
+                          default:
+                            return Container();
                         }
-                      },
+                      }).toList(),
                     );
-                  },
-                );
-              }),
-        ],
+                  } else {
+                    return Container();
+                  }
+                }),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BlocBuilder<CloudBloc, CloudState>(
+              buildWhen: (previous, current) => current is CloudStateInitial,
+              builder: (context, state) {
+                if (state is CloudStateInitial &&
+                    (state.selectedImages?.isNotEmpty ?? false)) {
+                  double height = _getContainerHeight(
+                      state.selectedImages!.length,
+                      MediaQuery.sizeOf(context).height);
+
+                  return Container(
+                    margin: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
+                    height: height,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.0),
+                      image: (state.selectedImages!.length == 1)
+                          ? DecorationImage(
+                              fit: BoxFit.cover,
+                              image: PhotoProvider(
+                                  mediumId: state.selectedImages!.first.id))
+                          : null,
+                      boxShadow: [
+                        BoxShadow(color: Colors.lightBlue.shade50),
+                      ],
+                      color: Colors.white54,
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                                '(${state.selectedImages!.length}) Select Images'),
+                            IconButton(
+                                onPressed: () {
+                                  context.read<CloudBloc>().add(
+                                        const CloudEventShareImage(clear: true),
+                                      );
+                                  context.read<CloudBloc>().add(
+                                        const CloudEventInitial(
+                                            hasImages: true),
+                                      );
+                                },
+                                style: IconButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.blueGrey),
+                                icon: const Icon(Icons.clear))
+                          ],
+                        ),
+                        if (state.selectedImages!.length > 1)
+                          Expanded(
+                            child: ImageGrid(
+                                images: state.selectedImages!,
+                                showBorder: false),
+                          ),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            StreamBuilder<Iterable<ImageData>>(
+                stream: context.select((CloudBloc bloc) => bloc.allImages),
+                builder: (context, snapshot) {
+                  return SendImageTextField(
+                    onSendMessage: (value) {
+                      context.read<CloudBloc>().add(CloudEventSendMessage(
+                          groupId: groupData.id, message: value));
+                    },
+                    onSelectGallary: () async {
+                      final Iterable<ImageData> images = snapshot.data ?? [];
+                      Navigator.of(context).pushNamed(
+                        AppRouts.selectionView,
+                        arguments: {
+                          'Images': images,
+                          'Image': null,
+                          'onSelect': () {
+                            context.read<CloudBloc>().add(
+                                  const CloudEventInitial(hasImages: true),
+                                );
+                            Navigator.pop(context);
+                          }
+                        },
+                      );
+                    },
+                  );
+                }),
+          ],
+        ),
       ),
     );
   }
@@ -467,7 +473,7 @@ class _SendImageTextFieldState extends State<SendImageTextField> {
           width: MediaQuery.sizeOf(context).width * 0.8,
           child: TextField(
             controller: _controller,
-            onTapOutside: (event) => FocusScope.of(context).unfocus(),
+            // onTapOutside: (event) => FocusScope.of(context).unfocus(),
             maxLines: null,
             decoration: InputDecoration(
               hintText: 'Message',
