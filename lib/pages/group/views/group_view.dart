@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gallary/helpers/image/image_grid.dart';
@@ -67,7 +69,7 @@ class GroupView extends StatelessWidget {
                       }).toList(),
                     );
                   } else {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   }
                 }),
           ),
@@ -94,8 +96,14 @@ class GroupView extends StatelessWidget {
                       image: (state.selectedImages!.length == 1)
                           ? DecorationImage(
                               fit: BoxFit.cover,
-                              image: PhotoProvider(
-                                  mediumId: state.selectedImages!.first.id))
+                              image: ((state.selectedImages?.first.id.isEmpty ??
+                                          false) &&
+                                      state.selectedImages?.first.path != null)
+                                  ? FileImage(File(
+                                          state.selectedImages!.first.path!))
+                                      as ImageProvider
+                                  : PhotoProvider(
+                                      mediumId: state.selectedImages!.first.id))
                           : null,
                       boxShadow: [
                         BoxShadow(color: Colors.lightBlue.shade50),
@@ -147,6 +155,11 @@ class GroupView extends StatelessWidget {
                     onSendMessage: (value) {
                       context.read<CloudBloc>().add(CloudEventSendMessage(
                           groupId: groupData.id, message: value));
+                    },
+                    onSelectCamera: () {
+                      context.read<CloudBloc>().add(
+                            const CloudEventClickImage(),
+                          );
                     },
                     onSelectGallary: () async {
                       final Iterable<ImageData> images = snapshot.data ?? [];
@@ -410,11 +423,9 @@ class ThumbnailGridImage extends StatelessWidget {
                 margin: const EdgeInsets.all(4.0),
                 decoration: BoxDecoration(
                     color: Colors.grey,
-                    image: (image?.imageURL != null)
-                        ? DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(image!.imageURL!))
-                        : null,
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(image!.imageURL!)),
                     borderRadius: BorderRadius.circular(12.0)),
               ),
             )
@@ -435,9 +446,11 @@ class SendImageTextField extends StatefulWidget {
       {super.key,
       required this.onSelectGallary,
       required this.onSendMessage,
-      this.controller});
+      this.controller,
+      required this.onSelectCamera});
 
   final VoidCallback onSelectGallary;
+  final VoidCallback onSelectCamera;
   final void Function(String? value) onSendMessage;
   final TextEditingController? controller;
 
@@ -482,7 +495,7 @@ class _SendImageTextFieldState extends State<SendImageTextField> {
                 children: <Widget>[
                   // camera icon button
                   IconButton(
-                    onPressed: () {},
+                    onPressed: widget.onSelectCamera,
                     icon: Icon(
                       Icons.camera_alt_rounded,
                       size: 27,

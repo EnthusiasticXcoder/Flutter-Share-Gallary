@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gallary/helpers/message_box.dart';
 import 'package:gallary/routs/app_routs.dart';
@@ -56,8 +58,10 @@ class ImageGrid extends StatelessWidget {
                     image: DecorationImage(
                       fit: BoxFit.cover,
                       image: (image.imageURL != null)
-                          ? NetworkImage(image.imageURL!) as ImageProvider
-                          : ThumbnailProvider(mediumId: image.id),
+                          ? NetworkImage(image.imageURL!)
+                          : (image.id.isEmpty && image.path != null)
+                              ? FileImage(File(image.path!)) as ImageProvider
+                              : ThumbnailProvider(mediumId: image.id),
                     ),
                     border: (showBorder)
                         ? Border.all(
